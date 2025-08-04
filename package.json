@@ -1,0 +1,50 @@
+{
+  "name": "encoderbytes",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "chart.js": "^4.4.3",
+    "cloudinary": "^2.4.0",
+    "cookies": "^0.9.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.2.0",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.14.1",
+    "next": "^14.2.4",
+    "next-cloudinary": "^6.12.0",
+    "next-connect": "^1.0.0",
+    "nodemailer": "^6.9.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.2.1",
+    "react-id-swiper": "^4.0.0",
+    "react-loading-skeleton": "^3.5.0",
+    "react-redux": "^9.2.0",
+    "react-table": "^7.8.0",
+    "react-toastify": "^10.0.5",
+    "swiper": "^11.1.1",
+    "swiper-react": "^1.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4"
+  }
+}
