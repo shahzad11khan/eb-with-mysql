@@ -1,10 +1,32 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Top from "../Utils/Top";
 import Image from "next/image";
 import { Uiuxappslogo } from "../components/Mobileapps";
 import Contactform from "../Utils/Contactform";
 import Link from "next/link";
-const Ai = () => {
+import { ProjectsCount } from "../AdminDashboard/components/ShowApidatas/ShowUserAPiDatas";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+const Uiux = () => {
+  const [Projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const getProjects = async () => {
+    try {
+      setLoading(true);
+      const {admins} = await ProjectsCount();
+      const uiuxProjects = admins.filter(p => p.ProjectCategory == "UI/UX").slice(0, 3);
+      setProjects(uiuxProjects);
+    } catch(error) {
+      console.log(`Failed to fetch projects: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getProjects();
+  }, []);
+
   return (
     <div className="bg-white">
       <Top />
@@ -62,7 +84,7 @@ const Ai = () => {
           <Link href='#form'
             className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
           >
-            Let’s Discuss
+            Let&apos;s Discuss
           </Link>
         </div>
         {/* iamge */}
@@ -280,7 +302,7 @@ const Ai = () => {
               return (
                 <div
                   key={items.image}
-                  className="border-2 border-gray-300 text-center flex flex-col gap-4 w-48 h-48 justify-center items-center rounded-xl "
+                  className="border-2 border-gray-300 text-center flex flex-col gap-4 w-47 h-47 justify-center items-center rounded-xl "
                 >
                   <Image
                     src={items.image}
@@ -297,12 +319,115 @@ const Ai = () => {
         </div>
       </div>
 
-      {/* section 8 */}
+      {/* section 8: Dynamic UI/UX Projects */}
+      <section className="bg-gray-100 pb-10 mt-20">
+        <div className="flex pt-20 justify-center items-center text-4xl font-bebas tracking-custom">
+          <span>UI/UX</span>
+          <span className="text-custom-blue">&nbsp;PROJECTS</span>
+        </div>
 
+        {loading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <Skeleton height={250} width={"100%"} borderRadius={12} />
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <Skeleton width={150} height={25}/>
+                <Skeleton width={250} height={25}/>
+                <Skeleton width={300} count={3}/>
+                <Skeleton width={150} height={40} borderRadius={6}/>
+              </div>
+            </div>
+          ))
+        ) : Projects && Projects.length > 0 ? (
+          Projects.map((project, index) => (
+            <div
+              key={project.id || project._id || index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <div className="relative w-full h-[250px]">
+                  <Image
+                    src={project.Image || "/backgrounds/app2.png"}
+                    alt={project.ProjectName || "Project Image"}
+                    className="object-cover rounded-lg"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 55vw"
+                    onError={(e) => {
+                      e.target.src = "/backgrounds/app2.png";
+                    }}
+                  />
+                </div>
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <div className="text-2xl font-bold text-paraClr">
+                  <span className="border-b-4 border-white">{project.ProjectCategory || "UI/UX"}</span>
+                </div>
+                <div className="text-4xl text-white font-bebas tracking-custom">
+                  {project.ProjectName || "Project Name"}
+                </div>
+                <p className="text-paraClr leading-tight line-clamp-3">
+                  {project.ProjectDescription || "Project description not available."}
+                </p>
+                <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
+                    <button>
+                      READ CASE STUDY
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div
+            className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+            style={{ backgroundColor: "rgb(164, 189, 247)" }}
+          >
+            <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
+              <Image
+                src="/backgrounds/app2.png"
+                alt="Default Project"
+                className="object-cover w-full h-full"
+                width={350}
+                height={350}
+              />
+            </div>
+            <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
+              <div className="text-2xl font-bold text-paraClr">
+                <span className="border-b-4 border-white">UI/UX</span>
+              </div>
+              <div className="text-4xl text-white font-bebas tracking-custom">
+                NO PROJECTS AVAILABLE
+              </div>
+              <p className="text-paraClr leading-tight">
+                Currently, there are no UI/UX projects available to display. Please check back later or contact us for more information.
+              </p>
+              <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                <button>COMING SOON</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col md:flex-row justify-center items-center  mt-10">
+          <Link href="/Projects"
+            className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-gray-100 hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
+          >
+            View Portfolio
+          </Link>
+        </div>
+      </section>
       {/* contact from */}
       <Contactform />
     </div>
   );
 };
 
-export default Ai;
+export default Uiux;

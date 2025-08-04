@@ -19,7 +19,7 @@ const WebAPP = () => {
     try {
       setLoading(true);
       const {admins} = await ProjectsCount();
-      const webAppProjects = admins.filter(p => p.ProjectCategory == "Web App");
+      const webAppProjects = admins.filter(p => p.ProjectCategory == "Web App").slice(0, 3);
       setProjects(webAppProjects);
     } catch(error) {
       console.log(`Failed to fetch projects: ${error}`);
@@ -75,7 +75,7 @@ const WebAPP = () => {
             <span className="text-custom-blue"> BY WEB APPLICATIONS.</span>
           </div>
           <p className="text-sm md:text-base text-paraClr leading-tight">
-            Encoderbytes delivers web based applications at every stage of the
+            Encoderbyte&apos;s delivers web based applications at every stage of the
             growth from tailored to specific needs of the company.
           </p>
 
@@ -244,7 +244,7 @@ const WebAPP = () => {
               return (
                 <div
                   key={items.image}
-                  className=" bg-[#F5F5F6] rounded-lg border-black w-[196px] h-[150px] gap-5 text-center flex flex-col justify-center items-center"
+                  className=" bg-[#F5F5F6] rounded-lg border-black w-[185px] h-[140px] gap-5 text-center flex flex-col justify-center items-center"
                 >
                   <Image
                     src={items.image}
@@ -279,7 +279,7 @@ const WebAPP = () => {
               return (
                 <div
                   key={items.image}
-                  className="border-2 border-gray-200 w-48 h-48 text-center flex flex-col gap-6 justify-center items-center rounded-lg "
+                  className="border-2 border-gray-200 w-47 h-47 text-center flex flex-col gap-6 justify-center items-center rounded-lg "
                 >
                   <img src={items.image} className="w-16" alt="image" />
                   <span className="font-semibold text-lg">{items.name}</span>
@@ -299,150 +299,98 @@ const WebAPP = () => {
           <span className="text-custom-blue">&nbsp; APPLICATIONS</span>
         </div>
 
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            {loading ? (
-              <Skeleton height={300} width={"100%"} borderRadius={12} />
-            ): Projects ?(
-              <img
-                src={Projects[0].Image}
-                alt={Projects[0].ProjectName}
-                className="object-cover rounded-lg "
-                width={400}
+        {loading ? (
+          // Show skeleton loaders while loading
+          Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <Skeleton height={250} width={"100%"} borderRadius={12} />
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <Skeleton width={150} height={25}/>
+                <Skeleton width={250} height={25}/>
+                <Skeleton width={300} count={3}/>
+                <Skeleton width={150} height={40} borderRadius={6}/>
+              </div>
+            </div>
+          ))
+        ) : Projects && Projects.length > 0 ? (
+          // Show all projects dynamically
+          Projects.map((project, index) => (
+            <div
+              key={project.id || project._id || index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <div className="relative w-full h-[250px]">
+                  <Image
+                    src={project.Image || "/backgrounds/app2.png"}
+                    alt={project.ProjectName || "Project Image"}
+                    className="object-cover rounded-lg"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 55vw"
+                    onError={(e) => {
+                      e.target.src = "/backgrounds/app2.png";
+                    }}
+                  />
+                </div>
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <div className="text-2xl font-bold text-paraClr">
+                  <span className="border-b-4 border-white">{project.ProjectCategory || "Web App"}</span>
+                </div>
+                <div className="text-4xl text-white font-bebas tracking-custom">
+                  {project.ProjectName || "Project Name"}
+                </div>
+                <p className="text-paraClr leading-tight line-clamp-3">
+                  {project.ProjectDescription || "Project description not available."}
+                </p>
+                <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
+                    <button>
+                      READ CASE STUDY
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          // Show fallback content when no projects are available
+          <div
+            className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+            style={{ backgroundColor: "rgb(164, 189, 247)" }}
+          >
+            <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
+              <Image
+                src="/backgrounds/app2.png"
+                alt="Default Project"
+                className="object-cover w-full h-full"
+                width={350}
                 height={350}
               />
-            ): (
-              <Image
-              src="/backgrounds/app2.png"
-              alt="Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-            )}
-          </div>
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              {loading ? (
-                <Skeleton width={150} height={25}/>
-              ) : Projects ? (
-                <span className="border-b-4 border-white">{Projects[0].ProjectCategory}</span>
-              ) : (
-                <>
-                <span className="border-b-4 border-white">v i d s </span>
-              <span className=" border-black">s a v e</span>
-              </>
-              )}
             </div>
-              {loading ? (
-                <Skeleton width={250} height={25}/>
-              ): Projects ? (
-                <div className="text-4xl text-white font-bebas tracking-custom">
-                {Projects[0].ProjectName}
-                </div>
-              ): (
-                <div className="text-4xl text-white font-bebas tracking-custom">
-                SOCIAL MEDIA VIDEO DOWNLOADER
-                </div>  
-              )}
-              {loading ? (
-                <Skeleton width={300} count={3}/>
-              ): Projects ? (
-                <p className="text-paraClr leading-tight line-clamp-3">
-                {Projects[0].ProjectDescription}
-                </p>
-              ): (
-                <p className="text-paraClr leading-tight">
-                With over 2 years of experience in AI, EncoderBytes helps build
-              software for businesses that can be a source of revenue for them.
-              We deliver AI services to businesses to enhance and add value to
-              their existing products. We also help them enhance their portfolio
-              by creating brand new software for them.
-            </p>
-              )}
-            <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-              <a href={`/Case_Study?project=${Projects[0]?.id || Projects[0]?._id || ""}`} rel="noopener noreferrer">
-                <button>
-                READ CASE STUDY
-              </button>
-              </a>
+            <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
+              <div className="text-2xl font-bold text-paraClr">
+                <span className="border-b-4 border-white">W e b  A p p</span>
+              </div>
+              <div className="text-4xl text-white font-bebas tracking-custom">
+                NO PROJECTS AVAILABLE
+              </div>
+              <p className="text-paraClr leading-tight">
+                Currently, there are no Web App projects available to display. Please check back later or contact us for more information.
+              </p>
+              <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                <button>COMING SOON</button>
+              </div>
             </div>
           </div>
-        </div>
-
-
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 my-20 md:my-14  gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              <span className="border-b-4 border-white">v i d s </span>
-              <span className=" border-black">s a v e</span>
-            </div>
-            <div className="text-4xl text-white font-bebas tracking-custom">
-              SOCIAL MEDIA VIDEO DOWNLOADER
-            </div>
-            <p className="text-paraClr leading-tight">
-              With over 2 years of experience in AI, EncoderBytes helps build
-              software for businesses that can be a source of revenue for them.
-              We deliver AI services to businesses to enhance and add value to
-              their existing products. We also help them enhance their portfolio
-              by creating brand new software for them.
-            </p>
-            <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-              <button>Read Casestudy</button>
-            </div>
-          </div>
-
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            <Image
-              src="/backgrounds/app3.png"
-              alt="Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-          </div>
-        </div>
-
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            <Image
-              src="/backgrounds/app1.png"
-              alt="Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              <span className="border-b-4 border-white">v i d s </span>
-              <span className=" border-black">s a v e</span>
-            </div>
-            <div className="text-4xl text-white font-bebas tracking-custom">
-              Social media video downloader
-            </div>
-            <p className="text-paraClr leading-tight">
-              With over 2 years of experience in AI, EncoderBytes helps build
-              software for businesses that can be a source of revenue for them.
-              We deliver AI services to businesses to enhance and add value to
-              their existing products. We also help them enhance their portfolio
-              by creating brand new software for them.
-            </p>
-            <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-              <button>Read Casestudy</button>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="flex flex-col md:flex-row justify-center items-center  mt-10">
           <Link href="/Projects">

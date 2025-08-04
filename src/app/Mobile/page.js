@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Top from "../Utils/Top";
 import Image from "next/image";
 import { Mobileapps } from "../components/Mobileapps";
@@ -6,8 +7,32 @@ import { Mobileappslogo } from "../components/Mobileapps";
 import { MobileAp } from "../components/carts";
 import Contactform from "../Utils/Contactform";
 import Link from "next/link";
+import { ProjectsCount } from "../AdminDashboard/components/ShowApidatas/ShowUserAPiDatas";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const MobileApp = () => {
+  const [Projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getProjects = async () => {
+    try {
+      setLoading(true);
+      const { admins } = await ProjectsCount();
+      const mobileAppProjects = admins.filter(p => p.ProjectCategory == "Mobile App").slice(0, 3);
+      setProjects(mobileAppProjects);
+    } catch (error) {
+      console.log(`Failed to fetch projects: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log(Projects);
+
+  useEffect(() => {
+    getProjects();
+  }, []);
   return (
     <div className=" bg-white">
       <Top />
@@ -80,7 +105,7 @@ const MobileApp = () => {
             <span className="text-custom-blue"> MOBILE USER EXPERIENCES.</span>
           </div>
           <p className="text-sm md:text-base text-paraClr leading-tight">
-            Encoderbytes&aposs mobile application development services enable you to realize your mobile app ideas into feature-rich user experiences. We provide bespoke mobile app development services for both iOS and Android platforms, irrespective of the device type (phone or tablet).
+            Encoderbytes&apos;s mobile application development services enable you to realize your mobile app ideas into feature-rich user experiences. We provide bespoke mobile app development services for both iOS and Android platforms, irrespective of the device type (phone or tablet).
             <br />
             <br />
             We have the perfect blend of aesthetic and technical skills to deliver sophisticated and user-centric mobile apps.
@@ -312,20 +337,20 @@ const MobileApp = () => {
           </div>
         </div>
       </div> */}
-      <div className="relative bg-[#F5F5F6] mt-20 h-[2500px] md:h-[1600px]">
+      <div className="relative bg-[#F5F5F6] mt-20 min-h-[2500px] md:min-h-[1600px] pb-10">
         <div className="relative" style={{ width: "100%" }}>
           <Image
-            className="h-full w-full bg-cover bg-center "
+            className="h-[300px] md:h-[400px] w-full bg-cover bg-center "
             src="/backgrounds/Rectangle-68.png"
             alt="Mobile App Development Background"
             width={400}
             height={500}
           />
-          <div className="absolute top-0 w-full text-center px-4 text-white">
-            <h2 className="text-3xl md:text-4xl mt-2 md:mt-20 font-bebas tracking-custom">
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 text-white">
+            <h2 className="text-2xl md:text-4xl font-bebas tracking-custom">
               <span>MOBILE APP DEVELOPMENT PROCESS</span>
             </h2>
-            <p className="mt-2 md:mt-4 mx-auto w-11/12 text-sm md:text-base md:w-8/12 leading-tight">
+            <p className="mt-2 md:mt-4 mx-auto w-11/12 text-xs md:text-base md:w-8/12 leading-tight">
               While developing a user-centric mobile application, we use
               up-to-date agile methodology of the software development cycle (SDLC)
               to ensure your satisfaction with expeditious development and delivery.
@@ -333,7 +358,7 @@ const MobileApp = () => {
           </div>
         </div>
 
-        <div className="absolute top-32 md:top-48 w-full px-4">
+        <div className="relative mt-8 md:mt-16 w-full px-4">
           <div className="mt-10 w-full md:w-5/6 bg-white rounded-xl py-10 px-5 mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-7 px-4 md:px-10">
               {MobileAp.map((cart) => (
@@ -455,18 +480,18 @@ const MobileApp = () => {
             <span className="">TOOLS & </span>
             <span className="text-custom-blue">TECHNOLOGIES</span>
           </div>
-          <p className="w-5/6 md:w-4/6 mt-3 text-center text-paraClr leading-tight">
+          <p className="w-4/5 md:w-3/5 mt-3 text-center text-paraClr leading-tight">
             We have a rich background in native iOS and Android mobile applications as well as cross-platform apps. One of our developed mobile applications, Pharmapedia, is ranked 5th around the globe. For developing a mobile application, we use the latest methodology and up-to-date technologies as mentioned:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8 mt-14 w-5/6">
-            {Mobileappslogo.map((item) => {
+          <div className=" grid grid-cols-2 md:grid-cols-6 gap-8 my-10  w-5/6">
+            {Mobileappslogo.map((items) => {
               return (
                 <div
-                  key={item.image}
-                  className="border-2 border-gray-200 w-48 h-48 text-center m-auto flex flex-col gap-6 justify-center items-center rounded-lg shadow-md transition-transform transform hover:scale-105"
+                  key={items.image}
+                  className="border-2 border-gray-200 w-47 h-47 text-center flex flex-col gap-6 justify-center items-center rounded-lg "
                 >
-                  <img src={item.image} className="w-16" alt={item.name} />
-                  <span className="font-semibold text-lg">{item.name}</span>
+                  <img src={items.image} className="w-16" alt="image" />
+                  <span className="font-semibold text-lg">{items.name}</span>
                 </div>
               );
             })}
@@ -603,104 +628,98 @@ const MobileApp = () => {
           <span className="text-custom-blue">&nbsp; APPLICATIONS</span>
         </div>
 
-        {/* App Showcase 1 */}
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            <Image
-              src="/backgrounds/app2.png"
-              alt="Pharmapedia App Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              <span className="border-b-4 border-white">v i d s </span>
-              <span className="border-black">s a v e</span>
+        {loading ? (
+          // Show skeleton loaders while loading
+          Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <Skeleton height={250} width={"100%"} borderRadius={12} />
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <Skeleton width={150} height={25}/>
+                <Skeleton width={250} height={25}/>
+                <Skeleton width={300} count={3}/>
+                <Skeleton width={150} height={40} borderRadius={6}/>
+              </div>
             </div>
-            <div className="text-4xl text-white font-bebas tracking-custom">
-              SOCIAL MEDIA VIDEO DOWNLOADER
+          ))
+        ) : Projects && Projects.length > 0 ? (
+          // Show all projects dynamically
+          Projects.map((project, index) => (
+            <div
+              key={project.id || project._id || index}
+              className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+              style={{ backgroundColor: "rgb(164, 189, 247)" }}
+            >
+              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                <div className="relative w-full h-[250px]">
+                  <Image
+                    src={project.Image || "/backgrounds/app2.png"}
+                    alt={project.ProjectName || "Project Image"}
+                    className="object-cover rounded-lg"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 55vw"
+                    onError={(e) => {
+                      e.target.src = "/backgrounds/app2.png";
+                    }}
+                  />
+                </div>
+              </div>
+              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                <div className="text-2xl font-bold text-paraClr">
+                  <span className="border-b-4 border-white">{project.ProjectCategory || "Mobile App"}</span>
+                </div>
+                <div className="text-4xl text-white font-bebas tracking-custom">
+                  {project.ProjectName || "Project Name"}
+                </div>
+                <p className="text-paraClr leading-tight line-clamp-3">
+                  {project.ProjectDescription || "Project description not available."}
+                </p>
+                <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
+                    <button>
+                      READ CASE STUDY
+                    </button>
+                  </a>
+                </div>
+              </div>
             </div>
-            <p className="text-paraClr leading-tight">
-              With over 2 years of experience in AI, EncoderBytes helps build software for businesses that can be a source of revenue for them. We deliver AI services to businesses to enhance and add value to their existing products. We also help them enhance their portfolio by creating brand new software for them.
-            </p>
-            <Link href='/Case_Study'>
-              <button className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                Read Casestudy
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        {/* App Showcase 2 */}
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 my-20 md:my-14 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              <span className="border-b-4 border-white">v i d s </span>
-              <span className="border-black">s a v e</span>
+          ))
+        ) : (
+          // Show fallback content when no projects are available
+          <div
+            className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
+            style={{ backgroundColor: "rgb(164, 189, 247)" }}
+          >
+            <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
+              <Image
+                src="/backgrounds/app2.png"
+                alt="Default Mobile App"
+                className="object-cover w-full h-full"
+                width={350}
+                height={350}
+              />
             </div>
-            <div className="text-4xl text-white font-bebas tracking-custom">
-              SOCIAL MEDIA VIDEO DOWNLOADER
+            <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
+              <div className="text-2xl font-bold text-paraClr">
+                <span className="border-b-4 border-white">M o b i l e  A p p</span>
+              </div>
+              <div className="text-4xl text-white font-bebas tracking-custom">
+                NO PROJECTS AVAILABLE
+              </div>
+              <p className="text-paraClr leading-tight">
+                Currently, there are no Mobile App projects available to display. Please check back later or contact us for more information.
+              </p>
+              <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
+                <button>COMING SOON</button>
+              </div>
             </div>
-            <p className="text-paraClr leading-tight">
-              With over 2 years of experience in AI, EncoderBytes helps build software for businesses that can be a source of revenue for them. We deliver AI services to businesses to enhance and add value to their existing products. We also help them enhance their portfolio by creating brand new software for them.
-            </p>
-            <Link href='/Case_Study'>
-              <button className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                Read Casestudy
-              </button>
-            </Link>
           </div>
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            <Image
-              src="/backgrounds/app3.png"
-              alt="Another App Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-          </div>
-        </div>
-
-        {/* App Showcase 3 */}
-        <div
-          className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
-          style={{ backgroundColor: "rgb(164, 189, 247)" }}
-        >
-          <div className="w-full md:w-[40%] h-auto md:h-full relative my-10">
-            <Image
-              src="/backgrounds/app1.png"
-              alt="Third App Logo"
-              className="object-cover w-full h-full"
-              width={350}
-              height={350}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
-            <div className="text-2xl font-bold text-paraClr">
-              <span className="border-b-4 border-white">v i d s </span>
-              <span className="border-black">s a v e</span>
-            </div>
-            <div className="text-4xl text-white font-bebas tracking-custom">
-              SOCIAL MEDIA VIDEO DOWNLOADER
-            </div>
-            <p className="text-paraClr leading-tight">
-              With over 2 years of experience in AI, EncoderBytes helps build software for businesses that can be a source of revenue for them. We deliver AI services to businesses to enhance and add value to their existing products. We also help them enhance their portfolio by creating brand new software for them.
-            </p>
-            <Link href='/Case_Study'>
-              <button className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                Read Casestudy
-              </button>
-            </Link>
-          </div>
-        </div>
+        )}
 
         <div className="flex flex-col md:flex-row justify-center items-center mt-10">
           <Link href="/Projects">
