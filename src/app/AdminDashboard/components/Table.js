@@ -27,8 +27,8 @@ const [latestProject, setLatestProject] = useState([]);
         <h2 className="text-xl font-semibold text-black">Top Projects</h2>
         <h2 className="text-xl font-semibold text-black pr-4">All</h2>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table-auto border-collapse border border-custom-blue w-full text-black">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[600px] table-auto border-collapse border border-custom-blue w-full text-black">
           <thead>
             <tr className="bg-gray-400">
               <th className="px-4 py-2">No</th>

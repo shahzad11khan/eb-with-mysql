@@ -67,7 +67,7 @@ const ProjectTable = () => {
       <Header className="min-w-full" />
       <div className="flex gap-4">
         <Sidebar />
-        <div className="container overflow-x-auto w-full p-4">
+        <div className="container overflow-x-auto w-full p-4 mt-10 md:mt-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Projects</h2>
             <button

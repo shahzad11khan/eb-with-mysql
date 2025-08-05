@@ -69,7 +69,7 @@ const Blogs = () => {
       <Header className="min-w-full" />
       <div className="flex gap-4">
         <Sidebar />
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 mt-10 md:mt-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Blogs</h2>
             <button

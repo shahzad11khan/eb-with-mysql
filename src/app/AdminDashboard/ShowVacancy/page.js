@@ -63,7 +63,7 @@ const VacancyTable = () => {
       <Header className="min-w-full" />
       <div className="flex gap-4">
         <Sidebar />
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 mt-10 md:mt-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Vacancies</h2>
             <button
@@ -128,7 +128,7 @@ const VacancyTable = () => {
                 ) : (
                   <tr>
                     <td colSpan="8" className="text-center py-4">
-                      {showAllVacancy.length !== 0 ? (
+                      {showAllVacancy.length == 0 ? (
                         <p>No Vacancy available.</p>
                       ) : (
                         <p>Please wait while loading...</p>

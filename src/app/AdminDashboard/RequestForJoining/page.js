@@ -47,7 +47,7 @@ const CandidateTable = () => {
       <Header className="min-w-full" />
       <div className="flex  gap-4">
         <Sidebar />
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 mt-10 md:mt-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Candidates</h2>
           </div>
@@ -66,14 +66,7 @@ const CandidateTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(showAllReq) && showAllReq.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="text-center py-8 text-gray-500">
-                      No requests yet
-                    </td>
-                  </tr>
-                ) : (
-                  Array.isArray(showAllReq) &&
+                {Array.isArray(showAllReq) && showAllReq.length > 0 ? (
                   showAllReq.map((item, idx) => (
                     <tr key={item.id} className="border-2 border-b-gray-500">
                       <td className="px-4 py-2">{idx + 1}</td>
@@ -85,9 +78,7 @@ const CandidateTable = () => {
                       <td className="px-4 py-2 text-center">
                         <button
                           className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                          onClick={() =>
-                            window.open(item.file_cv, "_blank")
-                          }
+                          onClick={() => window.open(item.file_cv, "_blank")}
                         >
                           Show CV
                         </button>
@@ -102,6 +93,12 @@ const CandidateTable = () => {
                       </td>
                     </tr>
                   ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="text-center py-8 text-gray-500">
+                      No requests yet
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

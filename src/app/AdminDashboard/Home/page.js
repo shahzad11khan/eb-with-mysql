@@ -92,9 +92,9 @@ const AdminHome = () => {
     <>
       <Header className="min-w-full" />
       <div className="flex gap-4">
-        <Sidebar />
-        <main className="w-full mt-5 h-60">
-          <section className="grid grid-cols-5 min-w-full justify-between gap-2 text-center rounded-xl">
+        <Sidebar /> 
+        <main className="w-full mt-5 md:mt-0 h-60">
+          <section className="grid grid-cols-2 md:grid-cols-5 min-w-full px-4 mt-14 justify-between gap-2 text-center rounded-xl">
             {[
               {
                 icon: <GrUserAdmin size={30} />,
@@ -136,17 +136,20 @@ const AdminHome = () => {
               </div>
             ))}
           </section>
-          <section className="grid grid-cols-2 min-w-full justify-evenly gap-4 mt-4">
+          <section className="flex flex-col min-w-full lg:flex-row justify-evenly gap-4 mt-4 px-4">
             <div className="w-full h-72 flex justify-center items-center  rounded-xl">
               <BarChart data={data} data1={data1} />
             </div>
             <div className="w-full h-72 flex justify-center items-center  rounded-xl">
               <DonutChart data={data} />
             </div>
-            <div className="w-full h-64 p-4  rounded-xl">
+          </section>
+          <section className="flex flex-col min-w-full lg:flex-row justify-evenly gap-10 mt-4">
+            <div className="w-[385px] md:w-full h-64 p-4  rounded-xl">
               <TableWithTitle />
             </div>
-            <div className="w-full h-72 flex flex-col items-center gap-3 text-white text-center">
+            <div className="w-full h-72 flex flex-col items-center gap-3 px-6 text-white">
+                <h1 className="text-lg md:text-2xl text-black font-semibold">Team Members</h1>
               <div className="h-16  rounded-xl w-full flex px-3 items-center border-2 border-custom-blue">
                 <div className="flex items-center text-black">
                   <div className="mr-2">
@@ -181,7 +184,7 @@ const AdminHome = () => {
               <div className="h-16  rounded-xl w-full flex px-3 items-center border-2 border-custom-blue">
                 <div className="flex items-center text-black">
                   <div className="mr-2">
-                    {showTeamMember[0] ? (
+                    {showTeamMember[1] ? (
                       <img
                         src={showTeamMember[1]?.image}
                         alt="image"
