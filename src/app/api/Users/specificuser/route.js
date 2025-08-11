@@ -50,35 +50,27 @@
 //     );
 //   }
 // }
+export const dynamic = "force-dynamic";
 
-// MYSQL METHOD
 import { connect } from "@/app/config/db";
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function GET() {
   try {
     const connection = await connect();
-
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page")) || 1;
-    const limit = parseInt(searchParams.get("limit")) || 10;
-    const offset = (page - 1) * limit;
 
     // Get total number of users
     const [countRows] = await connection.query("SELECT COUNT(*) AS count FROM users");
     const userCount = countRows[0].count;
 
-    // Fetch paginated users
+    // Fetch all users
     const [users] = await connection.query(
-      "SELECT id, username, email,password,confirmpassword, image, created_at FROM users LIMIT ? OFFSET ?",
-      [limit, offset]
+      "SELECT id, username, email, password, confirmpassword, image, created_at FROM users"
     );
 
     return NextResponse.json({
       result: users,
-      count: userCount,
-      page: page,
-      totalPages: Math.ceil(userCount / limit),
+      count: userCount
     });
   } catch (error) {
     console.error("Error fetching users:", error);
