@@ -49,10 +49,11 @@ export async function connect() {
   try {
     const connection = await mysql.createConnection({
       host: 'localhost',
-      user: 'root',           
-      password: '',           
-      database: 'encoderbytes',
-      port: 3306              
+      // user: 'root',           
+      user: 'encolzgh_encolzgh',           
+      password: 'encolzgh_encolzgh',           
+      database: 'encolzgh_encoderbytes',
+      // port: 3306              
     });
 
     console.log('MySQL connected successfully');
