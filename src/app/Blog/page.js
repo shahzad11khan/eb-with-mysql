@@ -7,33 +7,38 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css"; 
 
 const Page = () => {
-  const [blogs, setBlog] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [expandedBlogs, setExpandedBlogs] = useState({});
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
-  const toggleBlogExpand = (idx) => {
+  // Toggle expanded state for a blog
+  const toggleBlogExpand = useCallback((idx) => {
     setExpandedBlogs((prev) => ({
       ...prev,
       [idx]: !prev[idx],
     }));
-  };
-
-  useEffect(() => {
-    getProjects();
   }, []);
-  const getProjects = async () => {
-    setLoading(true); // Start loading
+
+  // Fetch blogs from API
+  const getBlogs = useCallback(async () => {
+    setLoading(true);
     try {
       const { admins } = await BlogsCount();
-      setBlog(admins);
+      setBlogs(admins || []);
     } catch (error) {
       console.log(`Failed to fetch blog: ${error}`);
+      setBlogs([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false); // End loading
-  };
+  }, []);
+
+  useEffect(() => {
+    getBlogs();
+  }, [getBlogs]);
 
   // Helper for rendering blog details
-  const renderBlogDetails = (blog, idx) => (
+  const renderBlogDetails = useCallback((blog, idx) => (
     <>
       <h1 className="font-bold text-2xl">
         <span>Title : </span>
@@ -57,7 +62,7 @@ const Page = () => {
         )}
       </p>
     </>
-  );
+  ), [expandedBlogs, toggleBlogExpand]);
 
   return (
     <div className="bg-white pb-20">

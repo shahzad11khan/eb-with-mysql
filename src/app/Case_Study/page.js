@@ -11,27 +11,27 @@ import { Limelight } from 'next/font/google';
 
 const CaseStudyPage = ({searchParams}) => {
   const projectId = searchParams.project;
-  console.log("ProjectId is :",projectId);
+  console.log("ProjectId is :", projectId);
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Stable getProjects function
+  const getProjects = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const { admins } = await ProjectsCount();
+      setProjects(admins);
+    } catch (error) {
+      console.log(`Failed to fetch team: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-     useEffect(() => {
-        getProjects();
-      }, [projectId]);
-
-  const getProjects = async () => {
-      try {
-        setLoading
-        const { admins } = await ProjectsCount();
-        setProjects(admins);
-      } catch (error) {
-        console.log(`Failed to fetch team: ${error}`);
-      }finally{
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
+    getProjects();
+  }, [getProjects, projectId]);
 
 
   const project = projects.find((p) => p.id === Number(projectId));

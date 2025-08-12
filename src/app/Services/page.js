@@ -1,11 +1,14 @@
 import React from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import Top from "../Utils/Top";
 import { Serviceslogo, CostOfSoftware } from "../components/Mobileapps";
 import { BiDownArrowCircle } from "react-icons/bi";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import Link from "next/link";
 import Contactform from "../Utils/Contactform";
+const ContactformDynamic = dynamic(() => import("../Utils/Contactform"), { ssr: false });
+
 const Services = () => {
   return (
     <div className="bg-white">
@@ -96,21 +99,18 @@ const Services = () => {
             and build competitive advantage
           </p>
           <div className="flex items-center md:flex-row flex-col justify-center my-14 gap-3 ">
-          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-10 pb-20 w-5/6"> */}
-            {Serviceslogo.map((items) => {
-              return (
-                <div
-                  key={items.image}
-                  className="border-2 flex flex-col w-[306px] h-[403px] gap-10   justify-center items-center text-white rounded-lg bg-custom-blue"
-                >
-                  <img src={items.image} alt="image" className="w-[88px] h-28" />
-                  <p className="text-[40px] font-bebas text-center leading-9">{items.name}</p>
-                  <Link href={items.href}>
-                    <BiDownArrowCircle size={40} />
-                  </Link>
-                </div>
-              );
-            })}
+            {React.useMemo(() => Serviceslogo.map((items) => (
+              <div
+                key={items.image}
+                className="border-2 flex flex-col w-[306px] h-[403px] gap-10 justify-center items-center text-white rounded-lg bg-custom-blue"
+              >
+                <Image src={items.image} alt="image" width={88} height={112} className="w-[88px] h-28 object-contain" />
+                <p className="text-[40px] font-bebas text-center leading-9">{items.name}</p>
+                <Link href={items.href}>
+                  <BiDownArrowCircle size={40} />
+                </Link>
+              </div>
+            )), [Serviceslogo])}
           </div>
         </div>
       </div>
@@ -242,39 +242,36 @@ const Services = () => {
             project.
           </p>
           <div className=" grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-10 pb-20 w-10/12">
-            {CostOfSoftware.map((items) => {
-              return (
-                <div
-                  key={items.image}
-                  className="border-2 border-gray-400 px-2  py-3 text-center flex flex-col gap-5 outline-none border-none justify-between items-center rounded-lg bg-white text-xl"
-                >
-                  <Image
-                    src={items.image}
-                    className="rounded-lg mt-10"
-                    width={80}
-                    height={80}
-                    alt="image"
-                  />
-                  <div className="">
-                    <div className="font-bebas text-2xl tracking-custom">
-
-                      <span>{items.name} </span>
-                      <span className="text-custom-blue">
-                        {items.name1}{" "}
-                      </span>
-                    </div>
-                    <div className="text-center flex justify-center text-sm text-paraClr leading-tight pb-5 mt-2">
-                      {items.des}
-                    </div>
+            {React.useMemo(() => CostOfSoftware.map((items) => (
+              <div
+                key={items.image}
+                className="border-2 border-gray-400 px-2 py-3 text-center flex flex-col gap-5 outline-none border-none justify-between items-center rounded-lg bg-white text-xl"
+              >
+                <Image
+                  src={items.image}
+                  className="rounded-lg mt-10 object-contain"
+                  width={80}
+                  height={80}
+                  alt="image"
+                />
+                <div className="">
+                  <div className="font-bebas text-2xl tracking-custom">
+                    <span>{items.name} </span>
+                    <span className="text-custom-blue">
+                      {items.name1}{" "}
+                    </span>
+                  </div>
+                  <div className="text-center flex justify-center text-sm text-paraClr leading-tight pb-5 mt-2">
+                    {items.des}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            )), [CostOfSoftware])}
           </div>
         </div>
       </div>
       {/* 6 section */}
-      <Contactform />
+  <ContactformDynamic />
     </div>
   );
 };

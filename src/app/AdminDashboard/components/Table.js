@@ -20,7 +20,7 @@ const [latestProject, setLatestProject] = useState([]);
     }
     fetchLatestProject();
   }, []);
-  console.log("Latest Project Data:", latestProject);
+  // console.log("Latest Project Data:", latestProject);
   return (
     <div className="">
       <div className="flex justify-between">

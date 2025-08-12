@@ -9,15 +9,30 @@ import { ProjectsCount } from "../AdminDashboard/components/ShowApidatas/ShowUse
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 const Uiux = () => {
+  const [latestProject, setLatestProject] = useState([]);
   const [Projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const getProjects = async () => {
     try {
       setLoading(true);
-      const {admins} = await ProjectsCount();
-      const uiuxProjects = admins.filter(p => p.ProjectCategory == "UI/UX").slice(0, 3);
+      const { admins } = await ProjectsCount();
+      const latestUIUXProjects = admins.filter(
+        (p) =>
+          p.ProjectCategory === "UIUX" &&
+          (p.LatestProject === "1" || p.LatestProject === 1)
+      );
+      setLatestProject(latestUIUXProjects);
+
+      const uiuxProjects = admins
+        .filter(
+          (p) =>
+            p.ProjectCategory == "UIUX" &&
+            p.LatestProject !== 1 &&
+            p.LatestProject !== "1"
+        )
+        .slice(0, 3);
       setProjects(uiuxProjects);
-    } catch(error) {
+    } catch (error) {
       console.log(`Failed to fetch projects: ${error}`);
     } finally {
       setLoading(false);
@@ -53,7 +68,8 @@ const Uiux = () => {
             href="/"
             className="text-paraClr font-semibold text-center md:text-left mt-20 text-xs"
           >
-            Home - Services -&nbsp; <span className="text-custom-blue">&nbsp;UI / UX</span>
+            Home - Services -&nbsp;{" "}
+            <span className="text-custom-blue">&nbsp;UI / UX</span>
           </a>
         </div>
       </div>
@@ -64,38 +80,83 @@ const Uiux = () => {
         <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
           <div className="font-bold text-paraClr text-lg">
             <span className="border-b-4 border-custom-blue">U s e r </span>
-            <span className="">&nbsp;e x p e r i e n c e &nbsp;d e s i g n i n g.</span>
+            <span className="">
+              &nbsp;e x p e r i e n c e &nbsp;d e s i g n i n g.
+            </span>
           </div>
           <div className="text-4xl font-bebas tracking-custom">
             <span className="text-paraClr">IMPROVE YOUR </span>
             <span className="text-custom-blue">USER EXPERIENCE?</span>
           </div>
-          <p className="text-sm md:text-base text-paraClr leading-tight">
-            Grabbing the market by your brands depends on the sophisticated
-            aesthetic UI/UX designs of your product. One of the leading
-            expertise of Encoderbytes is the strong UI/UX designing background
-            with a skilled workforce. Our UI/UX designs are focused on efficient
-            solutions to user problems. We apply design thinking to product
-            design, therefore we categorize the UX process to 5 key phases :
-            Product definition, Research, Analysis, Design and validation. Our
-            systematic approach results in an unconventional UI and UX design –
-            a user friendly solution.
-          </p>  
-          <Link href='#form'
-            className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
-          >
-            Let&apos;s Discuss
-          </Link>
+
+          {loading ? (
+            <Skeleton width={100} height={30} />
+          ) : latestProject[0] ? (
+            <h1 className="text-paraClr text-4xl font-bebas underline">
+              {latestProject[0].ProjectName}
+            </h1>
+          ) : null}
+
+          {loading ? (
+            <Skeleton count={5} width={400} />
+          ) : latestProject[0] ? (
+            <p className="text-sm md:text-base text-paraClr leading-tight line-clamp-6">
+              {latestProject[0].ProjectDescription}
+            </p>
+          ) : (
+            <p className="text-sm md:text-base text-paraClr leading-tight">
+              Grabbing the market by your brands depends on the sophisticated
+              aesthetic UI/UX designs of your product. One of the leading
+              expertise of Encoderbytes is the strong UI/UX designing background
+              with a skilled workforce. Our UI/UX designs are focused on
+              efficient solutions to user problems. We apply design thinking to
+              product design, therefore we categorize the UX process to 5 key
+              phases : Product definition, Research, Analysis, Design and
+              validation. Our systematic approach results in an unconventional
+              UI and UX design – a user friendly solution.
+            </p>
+          )}
+          {latestProject[0] ? (
+            <a
+              href={`/Case_Study?project=${
+                latestProject[0]?.id || latestProject[0]?._id || ""
+              }`}
+              rel="noopener noreferrer"
+            >
+              <button className="text-custom-blue font-semibold transition-all w-[157px] h-11 border-2 border-custom-blue rounded-md hover:text-white hover:bg-custom-blue flex items-center justify-center gap-3">
+                Read Details
+              </button>
+            </a>
+          ) : (
+            <Link
+              href="#form"
+              className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
+            >
+              Let’s Discuss
+            </Link>
+          )}
         </div>
         {/* iamge */}
         <div className="bg-yellow w-full md:w-[50%] h-auto md:h-full relative">
-          <Image
-            src="/backgrounds/Rectangle29.png"
-            alt="Logo"
-            className="object-cover w-full h-full"
-            width={400}
-            height={400}
-          />
+          {loading ? (
+            <Skeleton width={400} height={300} />
+          ) : latestProject[0] ? (
+            <Image
+              src={latestProject[0].Image}
+              alt={latestProject[0].ProjectName}
+              className="object-cover w-full h-full rounded-lg"
+              width={400}
+              height={400}
+            />
+          ) : (
+            <Image
+              src="/backgrounds/Rectangle29.png"
+              alt="Logo"
+              className="object-cover w-full h-full"
+              width={400}
+              height={400}
+            />
+          )}
         </div>
       </div>
 
@@ -108,7 +169,9 @@ const Uiux = () => {
             <span className="text-custom-blue">DESIGNING PROCESS</span>
           </div>
           <p className="md:w-3/5 mt-3 text-center text-paraClr leading-tight">
-            We follow a complete user experience designing process from start like user research to designing high fiedelity designs. Each phase involves users of the product to get better result.
+            We follow a complete user experience designing process from start
+            like user research to designing high fiedelity designs. Each phase
+            involves users of the product to get better result.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-16 md:mx-16">
@@ -333,14 +396,22 @@ const Uiux = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <Skeleton height={250} width={"100%"} borderRadius={12} />
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                <Skeleton width={150} height={25}/>
-                <Skeleton width={250} height={25}/>
-                <Skeleton width={300} count={3}/>
-                <Skeleton width={150} height={40} borderRadius={6}/>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
+                <Skeleton width={150} height={25} />
+                <Skeleton width={250} height={25} />
+                <Skeleton width={300} count={3} />
+                <Skeleton width={150} height={40} borderRadius={6} />
               </div>
             </div>
           ))
@@ -351,35 +422,49 @@ const Uiux = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <div className="relative w-full h-[250px]">
                   <Image
                     src={project.Image || "/backgrounds/app2.png"}
                     alt={project.ProjectName || "Project Image"}
                     className="object-cover rounded-lg"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    width={400}
+                    height={250}
                     onError={(e) => {
                       e.target.src = "/backgrounds/app2.png";
                     }}
                   />
                 </div>
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
                 <div className="text-2xl font-bold text-paraClr">
-                  <span className="border-b-4 border-white">{project.ProjectCategory || "UI/UX"}</span>
+                  <span className="border-b-4 border-white">
+                    {project.ProjectCategory || "UI/UX"}
+                  </span>
                 </div>
                 <div className="text-4xl text-white font-bebas tracking-custom">
                   {project.ProjectName || "Project Name"}
                 </div>
                 <p className="text-paraClr leading-tight line-clamp-3">
-                  {project.ProjectDescription || "Project description not available."}
+                  {project.ProjectDescription ||
+                    "Project description not available."}
                 </p>
                 <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
-                    <button>
-                      READ CASE STUDY
-                    </button>
+                  <a
+                    href={`/Case_Study?project=${
+                      project.id || project._id || ""
+                    }`}
+                    rel="noopener noreferrer"
+                  >
+                    <button>READ CASE STUDY</button>
                   </a>
                 </div>
               </div>
@@ -407,7 +492,8 @@ const Uiux = () => {
                 NO PROJECTS AVAILABLE
               </div>
               <p className="text-paraClr leading-tight">
-                Currently, there are no UI/UX projects available to display. Please check back later or contact us for more information.
+                Currently, there are no UI/UX projects available to display.
+                Please check back later or contact us for more information.
               </p>
               <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
                 <button>COMING SOON</button>
@@ -417,7 +503,8 @@ const Uiux = () => {
         )}
 
         <div className="flex flex-col md:flex-row justify-center items-center  mt-10">
-          <Link href="/Projects"
+          <Link
+            href="/Projects"
             className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-gray-100 hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
           >
             View Portfolio

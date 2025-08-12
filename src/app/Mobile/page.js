@@ -12,6 +12,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const MobileApp = () => {
+  const [latestProject, setLatestProject] = useState([]);
   const [Projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +20,21 @@ const MobileApp = () => {
     try {
       setLoading(true);
       const { admins } = await ProjectsCount();
-      const mobileAppProjects = admins.filter(p => p.ProjectCategory == "Mobile App").slice(0, 3);
+      const latestMobileProjects = admins.filter(
+        (p) =>
+          p.ProjectCategory === "Mobile App" &&
+          (p.LatestProject === "1" || p.LatestProject === 1)
+      );
+      setLatestProject(latestMobileProjects);
+
+      const mobileAppProjects = admins
+        .filter(
+          (p) =>
+            p.ProjectCategory == "Mobile App" &&
+            p.LatestProject !== 1 &&
+            p.LatestProject !== "1"
+        )
+        .slice(0, 3);
       setProjects(mobileAppProjects);
     } catch (error) {
       console.log(`Failed to fetch projects: ${error}`);
@@ -28,7 +43,7 @@ const MobileApp = () => {
     }
   };
 
-  console.log(Projects);
+  // console.log(Projects);
 
   useEffect(() => {
     getProjects();
@@ -58,7 +73,10 @@ const MobileApp = () => {
             href="/"
             className="text-paraClr font-semibold text-center md:text-left mt-20 text-xs"
           >
-            Home - Services -&nbsp; <span className="text-custom-blue">&nbsp;Mobile App Development</span>
+            Home - Services -&nbsp;{" "}
+            <span className="text-custom-blue">
+              &nbsp;Mobile App Development
+            </span>
           </a>
         </div>
       </div>
@@ -95,7 +113,7 @@ const MobileApp = () => {
         </div>
       </div> */}
       <section className="flex flex-col md:flex-row justify-center items-center px-6 md:px-32 mt-20 md:mt-32 md:gap-x-8 mb-32">
-        <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
+        <div className="flex flex-col justify-center items-center md:items-start gap-5 text-center md:text-left md:w-[50%]">
           <h2 className="font-bold text-paraClr text-lg">
             <span className="border-b-4 border-custom-blue">M o b i</span>
             <span> l e &nbsp; a p p &nbsp; d e v e l o p m e n t.</span>
@@ -104,29 +122,77 @@ const MobileApp = () => {
             <span className="text-paraClr">WE BUILD GOOD</span>
             <span className="text-custom-blue"> MOBILE USER EXPERIENCES.</span>
           </div>
-          <p className="text-sm md:text-base text-paraClr leading-tight">
-            Encoderbytes&apos;s mobile application development services enable you to realize your mobile app ideas into feature-rich user experiences. We provide bespoke mobile app development services for both iOS and Android platforms, irrespective of the device type (phone or tablet).
-            <br />
-            <br />
-            We have the perfect blend of aesthetic and technical skills to deliver sophisticated and user-centric mobile apps.
-          </p>
-          <Link href='#form'
-            className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
-          >
-            Let’s Discuss
-          </Link>
+
+          {loading ? (
+            <Skeleton width={100} height={30} />
+          ) : latestProject[0] ? (
+            <h1 className="text-paraClr text-4xl font-bebas underline">
+              {latestProject[0].ProjectName}
+            </h1>
+          ) : null}
+
+          {loading ? (
+            <Skeleton count={5} width={400} />
+          ) : latestProject[0] ? (
+            <p className="text-sm md:text-base text-paraClr leading-tight line-clamp-6">
+              {latestProject[0].ProjectDescription}
+            </p>
+          ) : (
+            <p className="text-sm md:text-base text-paraClr leading-tight">
+              Encoderbytes&apos;s mobile application development services enable
+              you to realize your mobile app ideas into feature-rich user
+              experiences. We provide bespoke mobile app development services
+              for both iOS and Android platforms, irrespective of the device
+              type (phone or tablet).
+              <br />
+              <br />
+              We have the perfect blend of aesthetic and technical skills to
+              deliver sophisticated and user-centric mobile apps.
+            </p>
+          )}
+
+          {latestProject[0] ? (
+            <a
+              href={`/Case_Study?project=${
+                latestProject[0]?.id || latestProject[0]?._id || ""
+              }`}
+              rel="noopener noreferrer"
+            >
+              <button className="text-custom-blue font-semibold transition-all w-[157px] h-11 border-2 border-custom-blue rounded-md hover:text-white hover:bg-custom-blue flex items-center justify-center gap-3">
+                Read Details
+              </button>
+            </a>
+          ) : (
+            <Link
+              href="#form"
+              className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
+            >
+              Let’s Discuss
+            </Link>
+          )}
         </div>
         <div className="bg-yellow w-full md:w-[50%] h-auto md:h-full relative">
-          <Image
-            src="/backgrounds/mobileapp.png"
-            alt="Mobile application development visual representation"
-            className="object-cover w-full h-full"
-            width={400}
-            height={400}
-          />
+          {loading ? (
+            <Skeleton width={400} height={300} />
+          ) : latestProject[0] ? (
+            <Image
+              src={latestProject[0].Image}
+              alt={latestProject[0].ProjectName}
+              className="object-cover w-full h-full rounded-lg"
+              width={400}
+              height={400}
+            />
+          ) : (
+            <Image
+              src="/backgrounds/mobileapp.png"
+              alt="Mobile application development visual representation"
+              className="object-cover w-full h-full"
+              width={400}
+              height={400}
+            />
+          )}
         </div>
       </section>
-
 
       {/* section 3 */}
       {/* <div className="bg-custom p-10 md:px-20" id="mobilesection3">
@@ -191,18 +257,29 @@ const MobileApp = () => {
         <div className="flex justify-center items-center flex-col mt-4">
           <h2 className="text-custom-blue  font-bebas tracking-custom flex justify-center items-center gap-2">
             <span className="text-black text-3xl">MOBILE APP</span>
-            <span className="text-custom-blue  text-3xl">DEVELOPMENT SERVICES</span>
+            <span className="text-custom-blue  text-3xl">
+              DEVELOPMENT SERVICES
+            </span>
           </h2>
           <p className="text-center w-5/6 md:w-4/6 text-paraClr leading-tight">
-            Encoderbytes is a leading mobile app development company based in Peshawar, Pakistan. We provide top-grade mobile app development services for Android and iOS platforms.
+            Encoderbytes is a leading mobile app development company based in
+            Peshawar, Pakistan. We provide top-grade mobile app development
+            services for Android and iOS platforms.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 mt-14 mx-16 mb-8">
           <div className="rounded-lg bg-white p-9">
             <div className="flex justify-between">
-              <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">01</span>
-              <Image src="/icons/android.png" alt="Android Development Icon" width={70} height={60} />
+              <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
+                01
+              </span>
+              <Image
+                src="/icons/android.png"
+                alt="Android Development Icon"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <h3 className="text-3xl font-bebas tracking-custom">
@@ -210,15 +287,24 @@ const MobileApp = () => {
                 <span className="text-custom-blue"> DEVELOPMENT</span>
               </h3>
               <p className="mt-2 text-paraClr opacity-50 leading-tight">
-                To meet your business requirements and the needs of end users, we develop Android apps. We use the latest tools and technology to create high-quality, user-friendly mobile applications.
+                To meet your business requirements and the needs of end users,
+                we develop Android apps. We use the latest tools and technology
+                to create high-quality, user-friendly mobile applications.
               </p>
             </div>
           </div>
 
           <div className="rounded-lg bg-white p-9">
             <div className="flex justify-between">
-              <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">02</span>
-              <Image src="/icons/apple.png" alt="iOS Development Icon" width={70} height={60} />
+              <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
+                02
+              </span>
+              <Image
+                src="/icons/apple.png"
+                alt="iOS Development Icon"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <h3 className="text-3xl font-bebas tracking-custom">
@@ -226,13 +312,14 @@ const MobileApp = () => {
                 <span className="text-custom-blue"> DEVELOPMENT</span>
               </h3>
               <p className="mt-2 text-paraClr opacity-50 leading-tight">
-                Our skilled mobile app developers create impactful iOS apps for smartphones and tablets, transforming your ideas into engaging, custom digital solutions that end users will enjoy.
+                Our skilled mobile app developers create impactful iOS apps for
+                smartphones and tablets, transforming your ideas into engaging,
+                custom digital solutions that end users will enjoy.
               </p>
             </div>
           </div>
         </div>
       </section>
-
 
       {/* section 4 */}
       <div id="mobilesection4"></div>
@@ -271,7 +358,11 @@ const MobileApp = () => {
             <span className="text-custom-blue">FOR DIFFERENT BUSINESSES</span>
           </h2>
           <p className="w-4/5 md:w-3/5 mt-3 text-center text-paraClr leading-tight">
-            We provide mobile application development services to various startups, SMEs, and large enterprises. Since 2019, we have successfully worked across multiple industries, including tech and healthcare, delivering quality mobile app services. No project is too big or too small for us.
+            We provide mobile application development services to various
+            startups, SMEs, and large enterprises. Since 2019, we have
+            successfully worked across multiple industries, including tech and
+            healthcare, delivering quality mobile app services. No project is
+            too big or too small for us.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mt-10">
@@ -280,7 +371,12 @@ const MobileApp = () => {
                 key={item.image}
                 className="bg-[#F5F5F6] rounded-lg border-black py-7 px-10 text-center flex flex-col justify-between items-center gap-4"
               >
-                <Image src={item.image} alt={`${item.name} Mobile App Icon`} width={60} height={60} />
+                <Image
+                  src={item.image}
+                  alt={`${item.name} Mobile App Icon`}
+                  width={60}
+                  height={60}
+                />
                 <span className="text-sm">{item.name}</span>
               </div>
             ))}
@@ -352,8 +448,9 @@ const MobileApp = () => {
             </h2>
             <p className="mt-2 md:mt-4 mx-auto w-11/12 text-xs md:text-base md:w-8/12 leading-tight">
               While developing a user-centric mobile application, we use
-              up-to-date agile methodology of the software development cycle (SDLC)
-              to ensure your satisfaction with expeditious development and delivery.
+              up-to-date agile methodology of the software development cycle
+              (SDLC) to ensure your satisfaction with expeditious development
+              and delivery.
             </p>
           </div>
         </div>
@@ -370,9 +467,7 @@ const MobileApp = () => {
                     <span className="text-xl md:text-4xl border-[#ffffff4e] border-b-4 border-dashed w-3/6">
                       {cart.title}
                     </span>
-                    <span className="text-6xl opacity-20">
-                      {cart.no}
-                    </span>
+                    <span className="text-6xl opacity-20">{cart.no}</span>
                   </div>
                   <div className="flex flex-col w-full mt-6 leading-tight">
                     <p>{cart.description}</p>
@@ -383,7 +478,6 @@ const MobileApp = () => {
           </div>
         </div>
       </div>
-
 
       {/* Section 6  */}
       <div id="mobilesection6"></div>
@@ -423,18 +517,26 @@ const MobileApp = () => {
               backgroundPosition: "center",
             }}
           >
-            <div className="text-3xl mt-16 font-bold">
-              COST TO
-            </div>
+            <div className="text-3xl mt-16 font-bold">COST TO</div>
 
             <div className="pb-3 pt-1 text-4xl md:text-8xl font-bebas tracking-custom">
               DEVELOP MOBILE APPS
             </div>
             <p className="mx-4 md:mx-36 text-center text-customFull leading-tight mb-5 text-sm md:text-base">
-              In our 16+ years of experience as a mobile app development company in the UK, we have delivered many Android and iOS app development projects that range from £10,000 to £500,000. As you can well imagine, mobile apps come in all shapes and sizes for different mobile devices. Features and functionality, scalability, usability, performance – all these factors greatly affect the scope of building a mobile app. This makes budgeting for a mobile app development project a tricky exercise. But with our experience in developing mobile apps, EncoderBytes can help with highly accurate estimations of your project cost.
+              In our 16+ years of experience as a mobile app development company
+              in the UK, we have delivered many Android and iOS app development
+              projects that range from £10,000 to £500,000. As you can well
+              imagine, mobile apps come in all shapes and sizes for different
+              mobile devices. Features and functionality, scalability,
+              usability, performance – all these factors greatly affect the
+              scope of building a mobile app. This makes budgeting for a mobile
+              app development project a tricky exercise. But with our experience
+              in developing mobile apps, EncoderBytes can help with highly
+              accurate estimations of your project cost.
             </p>
 
-            <Link href='#form'
+            <Link
+              href="#form"
               className="text-custom-blue hover:text-white font-medium w-36 h-10 outline-none transition-all mt-6 rounded-md bg-white hover:bg-custom-blue mb-6 transform hover:scale-105 flex justify-center items-center"
             >
               Let&apos;s Discuss
@@ -442,7 +544,6 @@ const MobileApp = () => {
           </div>
         </div>
       </section>
-
 
       {/* section 7  */}
       <div id="mobilesection7"></div>
@@ -481,7 +582,11 @@ const MobileApp = () => {
             <span className="text-custom-blue">TECHNOLOGIES</span>
           </div>
           <p className="w-4/5 md:w-3/5 mt-3 text-center text-paraClr leading-tight">
-            We have a rich background in native iOS and Android mobile applications as well as cross-platform apps. One of our developed mobile applications, Pharmapedia, is ranked 5th around the globe. For developing a mobile application, we use the latest methodology and up-to-date technologies as mentioned:
+            We have a rich background in native iOS and Android mobile
+            applications as well as cross-platform apps. One of our developed
+            mobile applications, Pharmapedia, is ranked 5th around the globe.
+            For developing a mobile application, we use the latest methodology
+            and up-to-date technologies as mentioned:
           </p>
           <div className=" grid grid-cols-2 md:grid-cols-6 gap-8 my-10  w-5/6">
             {Mobileappslogo.map((items) => {
@@ -498,7 +603,6 @@ const MobileApp = () => {
           </div>
         </div>
       </div>
-
 
       {/* section 8 */}
       {/* <section className="bg-gray-100 pb-10 mt-20">
@@ -636,14 +740,22 @@ const MobileApp = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <Skeleton height={250} width={"100%"} borderRadius={12} />
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                <Skeleton width={150} height={25}/>
-                <Skeleton width={250} height={25}/>
-                <Skeleton width={300} count={3}/>
-                <Skeleton width={150} height={40} borderRadius={6}/>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
+                <Skeleton width={150} height={25} />
+                <Skeleton width={250} height={25} />
+                <Skeleton width={300} count={3} />
+                <Skeleton width={150} height={40} borderRadius={6} />
               </div>
             </div>
           ))
@@ -655,35 +767,49 @@ const MobileApp = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <div className="relative w-full h-[250px]">
                   <Image
                     src={project.Image || "/backgrounds/app2.png"}
                     alt={project.ProjectName || "Project Image"}
                     className="object-cover rounded-lg"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    width={400}
+                    height={250}
                     onError={(e) => {
                       e.target.src = "/backgrounds/app2.png";
                     }}
                   />
                 </div>
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
                 <div className="text-2xl font-bold text-paraClr">
-                  <span className="border-b-4 border-white">{project.ProjectCategory || "Mobile App"}</span>
+                  <span className="border-b-4 border-white">
+                    {project.ProjectCategory || "Mobile App"}
+                  </span>
                 </div>
                 <div className="text-4xl text-white font-bebas tracking-custom">
                   {project.ProjectName || "Project Name"}
                 </div>
                 <p className="text-paraClr leading-tight line-clamp-3">
-                  {project.ProjectDescription || "Project description not available."}
+                  {project.ProjectDescription ||
+                    "Project description not available."}
                 </p>
                 <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
-                    <button>
-                      READ CASE STUDY
-                    </button>
+                  <a
+                    href={`/Case_Study?project=${
+                      project.id || project._id || ""
+                    }`}
+                    rel="noopener noreferrer"
+                  >
+                    <button>READ CASE STUDY</button>
                   </a>
                 </div>
               </div>
@@ -706,13 +832,17 @@ const MobileApp = () => {
             </div>
             <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
               <div className="text-2xl font-bold text-paraClr">
-                <span className="border-b-4 border-white">M o b i l e  A p p</span>
+                <span className="border-b-4 border-white">
+                  M o b i l e A p p
+                </span>
               </div>
               <div className="text-4xl text-white font-bebas tracking-custom">
                 NO PROJECTS AVAILABLE
               </div>
               <p className="text-paraClr leading-tight">
-                Currently, there are no Mobile App projects available to display. Please check back later or contact us for more information.
+                Currently, there are no Mobile App projects available to
+                display. Please check back later or contact us for more
+                information.
               </p>
               <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
                 <button>COMING SOON</button>

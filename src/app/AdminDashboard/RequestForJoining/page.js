@@ -12,12 +12,19 @@ import {API_URL_Request} from "../components/ShowApidatas/apiUrls"
 const CandidateTable = () => {
   const router = useRouter();
   const [showAllReq, setshowAllReq] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestsError, setRequestsError] = useState(null);
   const fetchRequests = () => {
+    setRequestsLoading(true);
+    setRequestsError(null);
     RequestCount()
       .then(({ admins }) => {
         setshowAllReq(admins);
+        setRequestsLoading(false);
       })
       .catch((error) => {
+        setRequestsError("Failed to fetch requests.");
+        setRequestsLoading(false);
         console.log(`Failed to fetch Request: ${error}`);
       });
   };
@@ -28,7 +35,7 @@ const CandidateTable = () => {
       return;
     }
     fetchRequests();
-  }, []);
+  }, [router]);
 
   // Function to delete an item
   const handleDelete = async (id) => {
@@ -66,7 +73,19 @@ const CandidateTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(showAllReq) && showAllReq.length > 0 ? (
+                {requestsLoading ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-8 text-gray-500">
+                      Loading requests...
+                    </td>
+                  </tr>
+                ) : requestsError ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-8 text-red-500">
+                      {requestsError}
+                    </td>
+                  </tr>
+                ) : Array.isArray(showAllReq) && showAllReq.length > 0 ? (
                   showAllReq.map((item, idx) => (
                     <tr key={item.id} className="border-2 border-b-gray-500">
                       <td className="px-4 py-2">{idx + 1}</td>

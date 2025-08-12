@@ -16,26 +16,24 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
 
-  const fetchUserData = useCallback(() => {
-    const userId = localStorage.getItem("userId");
-    // console.log(userId)
-    if (!userId) return;
-
-     axios
-      .get(`/api/Users/${userId}`)
-      .then((res) => {
-        const adminData = res.data.result;
-        // console.log(adminData)
-        setImagePreview(adminData.image);
-      })
-      .catch((error) => {
-        console.error(`Error fetching user data: ${error}`);
-      });
+  // Fetch user data with async/await for better readability
+  const fetchUserData = useCallback(async () => {
+    try {
+      const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+      if (!userId) return;
+      const res = await axios.get(`/api/Users/${userId}`);
+      const adminData = res.data.result;
+      setImagePreview(adminData?.image || "");
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setImagePreview("");
+    }
   }, []);
 
   useEffect(() => {
-    fetchUserData();
-    // console.log(fetchUserData())
+    if (typeof window !== "undefined") {
+      fetchUserData();
+    }
   }, [fetchUserData]);
 
   const toggleDropdown = useCallback(() => {
@@ -46,16 +44,15 @@ const Header = () => {
     try {
       await axios.get("/api/Users/logout", { timeout: 10000 });
     } catch (error) {
-      console.error(`Error logging out: ${error.message}`);
+      console.error("Error logging out:", error);
     }
-
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    // Cookies.remove("token");
-
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("userId");
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("email");
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
     router.push("/AdminDashboard/Login");
     toast.success("Logged out successfully");
   }, [router]);
@@ -64,7 +61,7 @@ const Header = () => {
     <header className="bg-custom-blue text-white py-4 sm:py-3 px-2 sm:px-4 md:px-6 md:py-6 flex items-center justify-between opacity-90 w-full">
       {/* Left side: Logo */}
       <div className="flex items-center">
-        <Image
+        <img
           src="/logos/logo.png"
           alt="Logo"
           className="h-7 w-auto sm:h-8"
@@ -74,10 +71,9 @@ const Header = () => {
       </div>
 
       {/* Middle: Encoderbytes */}
-      <div className="flex items-center justify-center gap-2 sm:gap-3">
+      {/* <div className="flex items-center justify-center gap-2 sm:gap-3">
         <span className="text-base sm:text-lg md:text-2xl font-bold whitespace-nowrap">Admin Dashboard</span>
-        {/* <DigitalClock /> */}
-      </div>
+      </div> */}
 
       {/* Right: Profile */}
       <div className="flex items-center">

@@ -13,20 +13,42 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const Ai = () => {
+  const [latestProject, setLatestProject] = useState([]);
   const [Projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const getProjects = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const {admins} = await ProjectsCount();
-      const aiProjects = admins.filter(p => p.ProjectCategory == "Ai").slice(0, 3);
+      const { admins } = await ProjectsCount();
+
+      // Get the latest AI project (only one)
+      const latest = admins.find(
+        (p) =>
+          p.ProjectCategory === "Ai" &&
+          (p.LatestProject === "1" || p.LatestProject === 1)
+      );
+      setLatestProject(latest ? [latest] : []);
+
+      // Get up to 3 non-latest AI projects
+      const aiProjects = admins
+        .filter(
+          (p) =>
+            p.ProjectCategory === "Ai" &&
+            p.LatestProject !== 1 &&
+            p.LatestProject !== "1"
+        )
+        .slice(0, 3);
       setProjects(aiProjects);
-    } catch(error) {
+    } catch (error) {
       console.log(`Failed to fetch projects: ${error}`);
+      setLatestProject([]);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     getProjects();
   }, []);
@@ -57,7 +79,10 @@ const Ai = () => {
             href="/"
             className="text-paraClr font-semibold text-center md:text-left mt-20 text-xs"
           >
-            Home - Services -&nbsp; <span className="text-custom-blue">&nbsp;Artificial-Intelligence</span>
+            Home - Services -&nbsp;{" "}
+            <span className="text-custom-blue">
+              &nbsp;Artificial-Intelligence
+            </span>
           </a>
         </div>
       </div>
@@ -68,34 +93,80 @@ const Ai = () => {
         <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
           <div className="font-bold text-paraClr text-lg">
             <span className="border-b-4 border-custom-blue">A r t i f</span>
-            <span className=""> &nbsp;i c i a l &nbsp;i n t e l l e g e n c e.</span>
+            <span className="">
+              {" "}
+              &nbsp;i c i a l &nbsp;i n t e l l e g e n c e.
+            </span>
           </div>
           <div className="text-4xl font-bebas tracking-custom">
             <span className="text-paraClr">WHAT IS </span>
             <span className="text-custom-blue">ARTIFICIAL INTELLIGENCE?</span>
           </div>
-          <p className="text-sm md:text-base text-paraClr leading-tight">
-            Encoderbyte&apos;s helps you by building software,AI services to your
-            businesses.which help them in generating revenues for them and also
-            add value to their existing product .It also helps you by enhancing
-            your portfolio by making brand new software for your business.We
-            have over 2 years of experience in AI.
-          </p>
-          <Link href='#form'
-            className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
-          >
-            Let&apos;s Discuss
-          </Link>
+
+          {loading ? (
+            <Skeleton width={100} height={30} />
+          ) : latestProject[0] ? (
+            <h1 className="text-paraClr text-4xl font-bebas underline">
+              {latestProject[0].ProjectName}
+            </h1>
+          ) : null}
+
+          {loading ? (
+            <Skeleton count={5} width={400} />
+          ) : latestProject[0] ? (
+            <p className="text-sm md:text-base text-paraClr leading-tight line-clamp-6">
+              {latestProject[0].ProjectDescription}
+            </p>
+          ) : (
+            <p className="text-sm md:text-base text-paraClr leading-tight">
+              Encoderbyte&apos;s helps you by building software,AI services to
+              your businesses.which help them in generating revenues for them
+              and also add value to their existing product .It also helps you by
+              enhancing your portfolio by making brand new software for your
+              business.We have over 2 years of experience in AI.
+            </p>
+          )}
+          {latestProject[0] ? (
+            <a
+              href={`/Case_Study?project=${
+                latestProject[0]?.id || latestProject[0]?._id || ""
+              }`}
+              rel="noopener noreferrer"
+            >
+              <button className="text-custom-blue font-semibold transition-all w-[157px] h-11 border-2 border-custom-blue rounded-md hover:text-white hover:bg-custom-blue flex items-center justify-center gap-3">
+                Read Details
+              </button>
+            </a>
+          ) : (
+            <Link
+              href="#form"
+              className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
+            >
+              Let’s Discuss
+            </Link>
+          )}
         </div>
         {/* iamge */}
         <div className="bg-yellow w-full md:w-[50%] h-auto md:h-full relative">
-          <Image
-            src="/backgrounds/Rectangle29.png"
-            alt="Logo"
-            className="object-cover w-full h-full"
-            width={400}
-            height={400}
-          />
+          {loading ? (
+            <Skeleton width={400} height={300} />
+          ) : latestProject[0] ? (
+            <Image
+              src={latestProject[0].Image}
+              alt={latestProject[0].ProjectName}
+              className="object-cover w-full h-full rounded-lg"
+              width={400}
+              height={400}
+            />
+          ) : (
+            <Image
+              src="/backgrounds/Rectangle29.png"
+              alt="Logo"
+              className="object-cover w-full h-full"
+              width={400}
+              height={400}
+            />
+          )}
         </div>
       </div>
 
@@ -108,10 +179,18 @@ const Ai = () => {
             <span className="text-custom-blue">SERVICES</span>
           </div>
           <div className="text-center w-full md:w-4/6 text-paraClr leading-tight">
-            We works with AI that are valuable assets for your business. <br /><br />
-            We works with AI that are valuable assets for your business.
-
-            For over 2 years, EncoderBytes has been providing software development and AI services to and garnering positive feedback from its clients. Our software is often is aimed at a widely diverse audience. Hence, we make sure that the software we develop is user-friendly, flexible, scalable, and secure. You can also count on us for cloud hosting and management instead of having to look for a different provider. By entrusting us with your app development project, you will be able to focus your time and resources on your core business functions.
+            We works with AI that are valuable assets for your business. <br />
+            <br />
+            We works with AI that are valuable assets for your business. For
+            over 2 years, EncoderBytes has been providing software development
+            and AI services to and garnering positive feedback from its clients.
+            Our software is often is aimed at a widely diverse audience. Hence,
+            we make sure that the software we develop is user-friendly,
+            flexible, scalable, and secure. You can also count on us for cloud
+            hosting and management instead of having to look for a different
+            provider. By entrusting us with your app development project, you
+            will be able to focus your time and resources on your core business
+            functions.
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 my-14 md:mx-16">
@@ -146,7 +225,12 @@ const Ai = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 02
               </span>
-              <Image src="/icons/user-experience.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/user-experience.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -167,7 +251,12 @@ const Ai = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 03
               </span>
-              <Image src="/icons/scalable.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/scalable.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -187,7 +276,12 @@ const Ai = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 04
               </span>
-              <Image src="/icons/cyber-security.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/cyber-security.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -208,7 +302,12 @@ const Ai = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 05
               </span>
-              <Image src="/icons/cyber-security.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/cyber-security.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -229,7 +328,12 @@ const Ai = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 06
               </span>
-              <Image src="/icons/cyber-security.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/cyber-security.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -262,18 +366,21 @@ const Ai = () => {
           <div>
             <div className="mb-4 md:mb-0 text-custom-blue font-bebas text-[40px] tracking-custom">
               <h1 className="text-white -mb-6">
-                Let’s discuss. <span className="text-custom-blue">How much</span>
+                Let’s discuss.{" "}
+                <span className="text-custom-blue">How much</span>
               </h1>
               <h2>Your App Costs?</h2>
             </div>
             <div className="text-[#e5e5e5] md:flex md:justify-start">
-              Send us the features you are looking to build, and we shall advise on the next steps.
+              Send us the features you are looking to build, and we shall advise
+              on the next steps.
             </div>
           </div>
           <div>
-
-            <Link href='#form'
-              className="text-white font-semibold transition-all w-[142px] h-11 border-2 bg-custom-blue border-custom-blue rounded-md hover:bg-transparent hover:text-custom-blue flex items-center justify-center">
+            <Link
+              href="#form"
+              className="text-white font-semibold transition-all w-[142px] h-11 border-2 bg-custom-blue border-custom-blue rounded-md hover:bg-transparent hover:text-custom-blue flex items-center justify-center"
+            >
               Let&apos;s Discuss
             </Link>
           </div>
@@ -309,7 +416,6 @@ const Ai = () => {
         </div>
       </div>
 
-
       <section className="bg-gray-100 pb-10 mt-20">
         <div className="flex pt-20 justify-center items-center text-4xl font-bebas tracking-custom">
           <span>AI</span>
@@ -323,14 +429,22 @@ const Ai = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <Skeleton height={250} width={"100%"} borderRadius={12} />
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                <Skeleton width={150} height={25}/>
-                <Skeleton width={250} height={25}/>
-                <Skeleton width={300} count={3}/>
-                <Skeleton width={150} height={40} borderRadius={6}/>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
+                <Skeleton width={150} height={25} />
+                <Skeleton width={250} height={25} />
+                <Skeleton width={300} count={3} />
+                <Skeleton width={150} height={40} borderRadius={6} />
               </div>
             </div>
           ))
@@ -341,35 +455,49 @@ const Ai = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <div className="relative w-full h-[250px]">
                   <Image
                     src={project.Image || "/backgrounds/app2.png"}
                     alt={project.ProjectName || "Project Image"}
                     className="object-cover rounded-lg"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    width={400}
+                    height={250}
                     onError={(e) => {
                       e.target.src = "/backgrounds/app2.png";
                     }}
                   />
                 </div>
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
                 <div className="text-2xl font-bold text-paraClr">
-                  <span className="border-b-4 border-white">{project.ProjectCategory || "Ai"}</span>
+                  <span className="border-b-4 border-white">
+                    {project.ProjectCategory || "Ai"}
+                  </span>
                 </div>
                 <div className="text-4xl text-white font-bebas tracking-custom">
                   {project.ProjectName || "Project Name"}
                 </div>
                 <p className="text-paraClr leading-tight line-clamp-3">
-                  {project.ProjectDescription || "Project description not available."}
+                  {project.ProjectDescription ||
+                    "Project description not available."}
                 </p>
                 <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
-                    <button>
-                      READ CASE STUDY
-                    </button>
+                  <a
+                    href={`/Case_Study?project=${
+                      project.id || project._id || ""
+                    }`}
+                    rel="noopener noreferrer"
+                  >
+                    <button>READ CASE STUDY</button>
                   </a>
                 </div>
               </div>
@@ -397,7 +525,8 @@ const Ai = () => {
                 NO PROJECTS AVAILABLE
               </div>
               <p className="text-paraClr leading-tight">
-                Currently, there are no AI projects available to display. Please check back later or contact us for more information.
+                Currently, there are no AI projects available to display. Please
+                check back later or contact us for more information.
               </p>
               <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
                 <button>COMING SOON</button>
@@ -407,7 +536,8 @@ const Ai = () => {
         )}
 
         <div className="flex flex-col md:flex-row justify-center items-center  mt-10">
-          <Link href="/Projects"
+          <Link
+            href="/Projects"
             className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-gray-100 hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
           >
             View Portfolio
@@ -415,7 +545,7 @@ const Ai = () => {
         </div>
       </section>
       <Contactform />
-    </div >
+    </div>
   );
 };
 

@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Siderbar";
-import AddNewProModal from "../components/AddNewProjectModal";
-import UpdateProjectModal from "../components/Updates/UpdateModelForProject";
+import dynamic from "next/dynamic";
 import axios from "axios";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -13,10 +12,14 @@ import { useRouter } from "next/navigation";
 import { ProjectsCount } from "../components/ShowApidatas/ShowUserAPiDatas";
 import { API_URL_Projects } from "../components/ShowApidatas/apiUrls";
 const ProjectTable = () => {
+  const AddNewProModal = dynamic(() => import("../components/AddNewProjectModal"), { ssr: false });
+  const UpdateProjectModal = dynamic(() => import("../components/Updates/UpdateModelForProject"), { ssr: false });
   const router = useRouter();
   const [showmodal, setShowModal] = useState(false);
   const [showProjectModel, setShowProjectModel] = useState(false);
   const [showAllPro, setShowAllPro] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsError, setProjectsError] = useState(null);
   const [selectedProId, setSelectedProId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredTeam, setFilteredTeam] = useState([]);
@@ -25,8 +28,10 @@ const ProjectTable = () => {
       router.push("/AdminDashboard/Login");
       return;
     }
+    setProjectsLoading(true);
+    setProjectsError(null);
     fetchProjects();
-  }, []);
+  }, [router]);
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
@@ -39,10 +44,13 @@ const ProjectTable = () => {
     ProjectsCount()
       .then(({ admins }) => {
         setShowAllPro(admins);
+        setProjectsLoading(false);
       })
       .catch((error) => {
-        console.log(`Failed to fetch projects: ${error}`);
+        setProjectsError("Failed to fetch projects.");
+        setProjectsLoading(false);
         setShowAllPro([]);
+        console.log(`Failed to fetch projects: ${error}`);
       });
   };
 
@@ -106,19 +114,32 @@ const ProjectTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {showAllPro.length > 0 ? (
-                  /* showAllPro.map((pro, idx) => ( */
+                {projectsLoading ? (
+                  <tr>
+                    <td colSpan="15" className="text-center py-4">
+                      <p>Loading projects...</p>
+                    </td>
+                  </tr>
+                ) : projectsError ? (
+                  <tr>
+                    <td colSpan="15" className="text-center py-4">
+                      <p>{projectsError}</p>
+                    </td>
+                  </tr>
+                ) : showAllPro.length > 0 ? (
                   (searchTerm !== "" ? filteredTeam : showAllPro).map(
                     (pro, idx) => (
                       <tr key={pro.id} className="border-2 border-b-gray-400">
                         <td className="px-4 py-2">{idx + 1}</td>
                         <td className="px-4 py-2">
-                          <img
+                          <Image
                             src={pro.Image}
                             alt={pro.ProjectName}
+                            width={64}
+                            height={64}
                             className="h-16 w-16 object-cover"
-                            width={40}
-                            height={40}
+                            loading="lazy"
+                            unoptimized
                           />
                         </td>
                         <td className="px-4 py-2">{pro.ProjectName}</td>
@@ -218,16 +239,10 @@ const ProjectTable = () => {
                       </tr>
                     )
                   )
-                ) : showAllPro.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">
-                      <p>No Project available.</p>
-                    </td>
-                  </tr>
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
-                      <p>Please wait while loading...</p>
+                    <td colSpan="15" className="text-center py-4">
+                      <p>No Project available.</p>
                     </td>
                   </tr>
                 )}

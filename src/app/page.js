@@ -3,9 +3,10 @@ import Image from "next/image";
 import { useEffect, useState } from "react"; // Add this import
 import axios from "axios"; 
 import { Cartobj } from "./components/carts";
-import Carousal from "./Utils/Carousal";
+import dynamic from "next/dynamic";
 import Top from "./Utils/Top";
-import Contactform from "./Utils/Contactform";
+const CarousalDynamic = dynamic(() => import("./Utils/Carousal"), { ssr: false });
+const ContactformDynamic = dynamic(() => import("./Utils/Contactform"), { ssr: false });
 import { FaArrowCircleRight } from "react-icons/fa";
 import Link from "next/link";
 import {API_URL_Projects} from "./AdminDashboard/components/ShowApidatas/apiUrls"
@@ -17,18 +18,20 @@ import { set } from "mongoose";
 export default function Home() {
   const [latestProject, setLatestProject] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   useEffect(() => {
     async function fetchLatestProject() {
       try {
-        setLoading(true); 
+        setLoading(true);
+        setError(null);
         const res = await axios.get(API_URL_Projects);
         const data = res.data;
-        // Find all the projects with LatestProject === 1
         const latestProjects = data.Result?.filter(p => p.LatestProject === 1 || p.LatestProject === "1");
-        setLatestProject(latestProjects);       
-      } catch (error) {
+        setLatestProject(latestProjects);
+      } catch (err) {
         setLatestProject([]);
-      }finally{
+        setError("Failed to load latest projects. Please try again later.");
+      } finally {
         setLoading(false);
       }
     }
@@ -469,22 +472,25 @@ export default function Home() {
         <div className="bg-yellow w-full md:w-[70%] h-auto  relative">
           {loading ? (
             <Skeleton height={300} width={"100%"} borderRadius={12} />
+          ) : error ? (
+            <div className="text-red-500 font-bold text-center py-10">{error}</div>
           ) : latestProject[0] ? (
-            <img
+            <Image
               src={latestProject[0].Image}
               alt={latestProject[0].ProjectName}
               className="object-cover w-full h-full rounded-lg"
               width={400}
               height={400}
+              unoptimized={latestProject[0].Image?.startsWith("http")}
             />
-          ):(
+          ) : (
             <Image
-            src="/backgrounds/induz-a-industrial-category-wordpress-theme.png"
-            alt="Logo"
-            className="object-cover w-full h-full"
-            width={400}
-            height={400}
-          />
+              src="/backgrounds/induz-a-industrial-category-wordpress-theme.png"
+              alt="Logo"
+              className="object-cover w-full h-full"
+              width={400}
+              height={400}
+            />
           )}
         </div>
 
@@ -820,14 +826,16 @@ export default function Home() {
             <div className="bg-yellow w-full md:w-[70%] h-auto relative">
             {loading ? (
               <Skeleton height={300} width={"100%"} borderRadius={12} />
-            ) : latestProject[1] ? 
-            (
-              <img
+            ) : error ? (
+              <div className="text-red-500 font-bold text-center py-10">{error}</div>
+            ) : latestProject[1] ? (
+              <Image
                 src={latestProject[1].Image}
                 alt={latestProject[1].ProjectCategory}
                 className="w-full h-full object-cover rounded-lg"
                 width={400}
                 height={400}
+                unoptimized={latestProject[1].Image?.startsWith("http")}
               />
             ) : (
               <Image
@@ -880,13 +888,16 @@ export default function Home() {
         <div className="bg-yellow w-full md:w-[70%] h-auto relative">
             {loading ? (
               <Skeleton height={300} width={"100%"} borderRadius={12} />
+            ) : error ? (
+              <div className="text-red-500 font-bold text-center py-10">{error}</div>
             ) : latestProject[2] ? (
-              <img
+              <Image
                 src={latestProject[2].Image}
                 alt={latestProject[2].ProjectCategory}
                 className="w-full h-full object-cover rounded-lg"
                 width={400}
                 height={400}
+                unoptimized={latestProject[2].Image?.startsWith("http")}
               />
             ) : (
               <Image
@@ -983,7 +994,7 @@ export default function Home() {
           </div>
         </div>
       </div> */}
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
         <div className="flex flex-col px-6 md:px-32 mt-10 md:mt-14 gap-y-8 md:gap-x-8">
           <div className="flex flex-col md:flex-row justify-center items-center gap-y-8 md:gap-x-8">
             <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
@@ -1055,10 +1066,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       
-      <Carousal />
-      <Contactform />
+  <CarousalDynamic />
+  <ContactformDynamic />
     </div>
   );
 }

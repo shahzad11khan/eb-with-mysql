@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Siderbar";
-import Modal from "../components/Modal";
-import UpdateAdminModal from "../components/Updates/UpdateModelForUser";
+import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -16,12 +15,16 @@ import { ShowAllAdmins } from "../components/ShowApidatas/ShowUserAPiDatas";
 import { API_URL_USER } from "../components/ShowApidatas/apiUrls";
 
 const AdminTable = () => {
+  const Modal = dynamic(() => import("../components/Modal"), { ssr: false });
+  const UpdateAdminModal = dynamic(() => import("../components/Updates/UpdateModelForUser"), { ssr: false });
   const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModel, setUpdateModel] = useState(false);
   const [adminVerifyModel, setVerifyModel] = useState(false);
   const [showAllAdmins, setShowAllAdmins] = useState([]);
+  const [adminsLoading, setAdminsLoading] = useState(false);
+  const [adminsError, setAdminsError] = useState(null);
   const [selectedAdminId, setSelectedAdminId] = useState("");
   const [selectedVerifyAdminId, setSelectedVerifyAdminId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,8 +34,10 @@ const AdminTable = () => {
       router.push("/AdminDashboard/Login");
       return;
     }
+    setAdminsLoading(true);
+    setAdminsError(null);
     getAdmin();
-  }, []);
+  }, [router]);
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
@@ -45,9 +50,11 @@ const AdminTable = () => {
     ShowAllAdmins()
       .then(({ admins }) => {
         setShowAllAdmins(admins);
-        // console.log(admins);
+        setAdminsLoading(false);
       })
       .catch((error) => {
+        setAdminsError("Failed to fetch admins.");
+        setAdminsLoading(false);
         console.error("Failed to fetch admins:", error);
       });
   };
@@ -127,14 +134,25 @@ const AdminTable = () => {
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Password</th>
                   {/* <th className="px-4 py-2">IsAdminVerified</th> */}
-                  <th className="px-4 py-2">VerifyAdmin</th>
+                  {/* <th className="px-4 py-2">VerifyAdmin</th> */}
                   <th className="px-4 py-2">Edit</th>
                   <th className="px-4 py-2">Delete</th>
                 </tr>
               </thead>
               <tbody>
-                {showAllAdmins.length > 0 ? (
-                  /* showAllAdmins.map((admin, index) => ( */
+                {adminsLoading ? (
+                  <tr>
+                    <td colSpan="8" className="text-center py-4">
+                      <p>Loading admins...</p>
+                    </td>
+                  </tr>
+                ) : adminsError ? (
+                  <tr>
+                    <td colSpan="8" className="text-center py-4">
+                      <p>{adminsError}</p>
+                    </td>
+                  </tr>
+                ) : showAllAdmins.length > 0 ? (
                   (searchTerm !== "" ? filteredTeam : showAllAdmins).map(
                     (admin, index) => (
                       <tr
@@ -143,10 +161,14 @@ const AdminTable = () => {
                       >
                         <td className="px-4 py-2 text-center">{index + 1}</td>
                         <td className="px-4 py-2">
-                          <img
+                          <Image
                             src={admin.image}
                             alt={admin.username}
+                            width={64}
+                            height={64}
                             className="h-16 w-16 object-cover"
+                            loading="lazy"
+                            unoptimized
                           />
                         </td>
                         <td className="px-4 py-2">{admin.username}</td>
@@ -159,21 +181,21 @@ const AdminTable = () => {
                             <span>&#x2717;</span>
                           )}
                         </td> */}
-                        <td className="px-4 py-2 text-center">
+                        {/* <td className="px-4 py-2 text-center">
                           <button
                             className="text-yellow-500 px-2 py-1 rounded hover:underline"
                             onClick={() =>
                               handleVerify(admin._id, admin.isVerfied)
                             }
                           >
-                            {/* Verify Admin */}
+                            
                             {admin.isVerfied ? (
                               <FaCheck />
                             ) : (
                               <span>&#x2717;</span>
                             )}{" "}
                           </button>
-                        </td>
+                        </td> */}
 
                         <td className="px-4 py-2 text-center">
                           <button
@@ -197,11 +219,7 @@ const AdminTable = () => {
                 ) : (
                   <tr>
                     <td colSpan="8" className="text-center py-4">
-                      {showAllAdmins.length !== 0 ? (
-                        <p>No users available.</p>
-                      ) : (
-                        <p>Please wait while loading...</p>
-                      )}
+                      <p>No users available.</p>
                     </td>
                   </tr>
                 )}

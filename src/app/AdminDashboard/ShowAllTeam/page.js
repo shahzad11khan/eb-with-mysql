@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Siderbar";
-import AddNewMemModal from "../components/AddNewMemModal";
-import UpdateAdminModal from "../components/Updates/UpdateModelForTeam";
+import dynamic from "next/dynamic";
 import axios from "axios";
 import { isAuthenticated } from "@/app/helper/verifytoken";
 import { useRouter } from "next/navigation";
@@ -11,12 +10,17 @@ import { TeamCount } from "../components/ShowApidatas/ShowUserAPiDatas";
 import { API_URL_TEAM } from "../components/ShowApidatas/apiUrls";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 const ShowAllTeam = () => {
+  const AddNewMemModal = dynamic(() => import("../components/AddNewMemModal"), { ssr: false });
+  const UpdateAdminModal = dynamic(() => import("../components/Updates/UpdateModelForTeam"), { ssr: false });
   const router = useRouter();
   const [showmodal, setshowmodal] = useState(false);
   const [showUpdateModel, setUpdateModel] = useState(false);
   const [showAllTeam, setshowAllTeam] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [teamError, setTeamError] = useState(null);
   const [selectedTeamId, setSelectedTeamId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredTeam, setFilteredTeam] = useState([]);
@@ -26,8 +30,10 @@ const ShowAllTeam = () => {
       router.push("/AdminDashboard/Login");
       return;
     }
+    setTeamLoading(true);
+    setTeamError(null);
     getTeam();
-  }, []);
+  }, [router]);
 
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -42,8 +48,10 @@ const ShowAllTeam = () => {
     try {
       const { admins } = await TeamCount();
       setshowAllTeam(admins);
-      console.log(admins);
+      setTeamLoading(false);
     } catch (error) {
+      setTeamError("Failed to fetch team members.");
+      setTeamLoading(false);
       console.log(`Failed to fetch team: ${error}`);
     }
   };
@@ -106,15 +114,31 @@ const ShowAllTeam = () => {
                 </tr>
               </thead>
               <tbody>
-                {showAllTeam.length > 0 ? (
+                {teamLoading ? (
+                  <tr>
+                    <td colSpan="9" className="text-center py-4">
+                      <p>Loading team members...</p>
+                    </td>
+                  </tr>
+                ) : teamError ? (
+                  <tr>
+                    <td colSpan="9" className="text-center py-4">
+                      <p>{teamError}</p>
+                    </td>
+                  </tr>
+                ) : showAllTeam.length > 0 ? (
                   sortedTeam.map((team, idx) => (
                     <tr key={team._id} className="border-2 border-b-gray-500">
                       <td className="p-2 text-center">{idx + 1}</td>
                       <td className="px-4 py-2">
-                        <img
+                        <Image
                           src={team.image}
                           alt={team.username}
+                          width={56}
+                          height={56}
                           className="h-14 w-14 object-cover"
+                          loading="lazy"
+                          unoptimized
                         />
                       </td>
                       <td className="px-4 py-2">{team.username}</td>
@@ -169,12 +193,8 @@ const ShowAllTeam = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
-                      {showAllTeam.length !== 0 ? (
-                        <p>Please wait while loading...</p>
-                      ) : (
-                        <p>No User Found</p>
-                      )}
+                    <td colSpan="9" className="text-center py-4">
+                      <p>No User Found</p>
                     </td>
                   </tr>
                 )}

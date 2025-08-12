@@ -56,6 +56,14 @@ export async function connect() {
       // port: 3306              
     });
 
+    // const connection = await mysql.createConnection({
+    //   host: 'localhost',
+    //   user: 'root',           
+    //   password: '',           
+    //   database: 'encoderbytes',
+    //   port: 3306              
+    // });
+
     console.log('MySQL connected successfully');
     return connection;
   } catch (error) {

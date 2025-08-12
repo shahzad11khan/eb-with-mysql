@@ -11,25 +11,39 @@ import { ProjectsCount } from "../AdminDashboard/components/ShowApidatas/ShowUse
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-
 const WebAPP = () => {
+  const [latestProject, setLatestProject] = useState([]);
   const [Projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const getProjects = async () => {
     try {
       setLoading(true);
-      const {admins} = await ProjectsCount();
-      const webAppProjects = admins.filter(p => p.ProjectCategory == "Web App").slice(0, 3);
+      const { admins } = await ProjectsCount();
+      const latestWebProjects = admins.filter(
+        (p) =>
+          p.ProjectCategory === "Web App" &&
+          (p.LatestProject === "1" || p.LatestProject === 1)
+      );
+      setLatestProject(latestWebProjects);
+
+      const webAppProjects = admins
+        .filter(
+          (p) =>
+            p.ProjectCategory == "Web App" &&
+            p.LatestProject !== 1 &&
+            p.LatestProject !== "1"
+        )
+        .slice(0, 3);
       setProjects(webAppProjects);
-    } catch(error) {
+    } catch (error) {
       console.log(`Failed to fetch projects: ${error}`);
     } finally {
       setLoading(false);
     }
-  }
+  };
   console.log(Projects);
-  
-  useEffect(() =>{
+
+  useEffect(() => {
     getProjects();
   }, []);
 
@@ -58,7 +72,8 @@ const WebAPP = () => {
             href="/"
             className="text-paraClr font-semibold text-center md:text-left mt-20 text-xs"
           >
-            Home - Services -&nbsp; <span className="text-custom-blue">&nbsp;Web App Development</span>
+            Home - Services -&nbsp;{" "}
+            <span className="text-custom-blue">&nbsp;Web App Development</span>
           </a>
         </div>
       </div>
@@ -74,26 +89,68 @@ const WebAPP = () => {
             <span className="text-paraClr">WE HELP BUSINESSES</span>
             <span className="text-custom-blue"> BY WEB APPLICATIONS.</span>
           </div>
-          <p className="text-sm md:text-base text-paraClr leading-tight">
-            Encoderbyte&apos;s delivers web based applications at every stage of the
-            growth from tailored to specific needs of the company.
-          </p>
+          {loading ? (
+            <Skeleton width={100} height={30} />
+          ) : latestProject[0] ? (
+            <h1 className="text-paraClr text-4xl font-bebas underline">
+              {latestProject[0].ProjectName}
+            </h1>
+          ) : null}
 
-          <Link href='#form'
-            className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
-          >
-            Let’s Discuss
-          </Link>
+          {loading ? (
+            <Skeleton count={5} width={400} />
+          ) : latestProject[0] ? (
+            <p className="text-sm md:text-base text-paraClr leading-tight line-clamp-6">
+              {latestProject[0].ProjectDescription}
+            </p>
+          ) : (
+            <p className="text-sm md:text-base text-paraClr leading-tight">
+              Encoderbyte&apos;s delivers web based applications at every stage
+              of the growth from tailored to specific needs of the company.
+            </p>
+          )}
+
+          {latestProject[0] ? (
+            <a
+              href={`/Case_Study?project=${
+                latestProject[0]?.id || latestProject[0]?._id || ""
+              }`}
+              rel="noopener noreferrer"
+            >
+              <button className="text-custom-blue font-semibold transition-all w-[157px] h-11 border-2 border-custom-blue rounded-md hover:text-white hover:bg-custom-blue flex items-center justify-center gap-3">
+                Read Details
+              </button>
+            </a>
+          ) : (
+            <Link
+              href="#form"
+              className="text-customFull transition-all w-36 h-10 font-semibold mt-4 rounded-md bg-custom-blue mb-6 hover:bg-white hover:border-2 hover:border-custom-blue hover:text-custom-blue flex items-center justify-center"
+            >
+              Let’s Discuss
+            </Link>
+          )}
         </div>
         {/* iamge */}
         <div className="bg-yellow w-full md:w-[50%] h-auto md:h-full relative">
-          <Image
-            src="/backgrounds/Rectangle29.png"
-            alt="Logo"
-            className="object-cover w-full h-full"
-            width={400}
-            height={400}
-          />
+          {loading ? (
+            <Skeleton width={400} height={300} />
+          ) : latestProject[0] ? (
+            <Image
+              src={latestProject[0].Image}
+              alt={latestProject[0].ProjectName}
+              className="object-cover w-full h-full rounded-lg"
+              width={400}
+              height={400}
+            />
+          ) : (
+            <Image
+              src="/backgrounds/Rectangle29.png"
+              alt="Logo"
+              className="object-cover w-full h-full"
+              width={400}
+              height={400}
+            />
+          )}
         </div>
       </div>
 
@@ -107,9 +164,8 @@ const WebAPP = () => {
           </div>
           <div className="text-center w-5/6 md:w-4/6 text-paraClr leading-tight">
             The carefully designed web application is needed for the product
-            idea of your startup that helps you innovate and solve real
-            business problems to disrupt established markets and gain
-            sustainability.
+            idea of your startup that helps you innovate and solve real business
+            problems to disrupt established markets and gain sustainability.
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 mt-14 md:mx-16">
@@ -142,7 +198,12 @@ const WebAPP = () => {
               <span className="text-4xl md:text-7xl font-bold text-paraClr opacity-20 font-bebas">
                 02
               </span>
-              <Image src="/icons/factory.png" alt="Logo" width={70} height={60} />
+              <Image
+                src="/icons/factory.png"
+                alt="Logo"
+                width={70}
+                height={60}
+              />
             </div>
             <div className="flex flex-col md:w-full ml-2 mt-6">
               <div className="text-3xl font-bebas tracking-custom">
@@ -178,12 +239,7 @@ const WebAPP = () => {
                   key={items.image}
                   className=" bg-[#F5F5F6] rounded-lg border-black p-4 gap-5 text-center flex flex-col justify-center items-center"
                 >
-                  <Image
-                    src={items.image}
-                    alt="image"
-                    width={60}
-                    height={60}
-                  />
+                  <Image src={items.image} alt="image" width={60} height={60} />
                   <span className="text-sm">{items.name}</span>
                 </div>
               );
@@ -209,15 +265,23 @@ const WebAPP = () => {
               INTELLECTUAL PROPERTY [IP] PROTECTION
             </div>
             <p className="mt-5 mx-4 md:mx-40 text-center leading-tight">
-              The devil is in the detail, and we ensure that our mobile application development services capture that by breaking down your project into different phases. Each phase is critical in the overall success of the mobile app development lifecycle.
+              The devil is in the detail, and we ensure that our mobile
+              application development services capture that by breaking down
+              your project into different phases. Each phase is critical in the
+              overall success of the mobile app development lifecycle.
             </p>
 
             <p className="mt-5 mx-4 md:mx-40 text-center leading-tight">
-              We are a Peshawar based web app development agency serving an impressive client in the Pakistan and worldwide. We take pride in the fact that our clients continue to say positive things about our work.
+              We are a Peshawar based web app development agency serving an
+              impressive client in the Pakistan and worldwide. We take pride in
+              the fact that our clients continue to say positive things about
+              our work.
             </p>
 
-            <Link href='#form'
-              className="text-custom-blue hover:text-white text-md w-40 h-10 transition-all font-semibold  mt-10 rounded-md bg-white hover:bg-custom-blue mb-2 flex items-center justify-center" >
+            <Link
+              href="#form"
+              className="text-custom-blue hover:text-white text-md w-40 h-10 transition-all font-semibold  mt-10 rounded-md bg-white hover:bg-custom-blue mb-2 flex items-center justify-center"
+            >
               Tell Us Your Idea
             </Link>
           </div>
@@ -230,7 +294,10 @@ const WebAPP = () => {
         <div className="flex justify-center items-center  flex-col mt-14 ">
           <div className="text-4xl text-center font-bebas tracking-custom">
             <span className="">WEB APPLICATION DEVELOPMENT</span>
-            <span className="text-custom-blue"> FOR A WIDE VARIETY OF INDUSTRIES</span>
+            <span className="text-custom-blue">
+              {" "}
+              FOR A WIDE VARIETY OF INDUSTRIES
+            </span>
           </div>
           <p className="w-4/5 md:w-3/5 mt-2 text-center text-paraClr leading-tight">
             Across the globe we have delivered large numbers of web applications
@@ -246,12 +313,7 @@ const WebAPP = () => {
                   key={items.image}
                   className=" bg-[#F5F5F6] rounded-lg border-black w-[185px] h-[140px] gap-5 text-center flex flex-col justify-center items-center"
                 >
-                  <Image
-                    src={items.image}
-                    alt="image"
-                    width={60}
-                    height={60}
-                  />
+                  <Image src={items.image} alt="image" width={60} height={60} />
                   <span className="text-sm">{items.name}</span>
                 </div>
               );
@@ -307,14 +369,22 @@ const WebAPP = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full md:w-[55%] h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <Skeleton height={250} width={"100%"} borderRadius={12} />
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                <Skeleton width={150} height={25}/>
-                <Skeleton width={250} height={25}/>
-                <Skeleton width={300} count={3}/>
-                <Skeleton width={150} height={40} borderRadius={6}/>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
+                <Skeleton width={150} height={25} />
+                <Skeleton width={250} height={25} />
+                <Skeleton width={300} count={3} />
+                <Skeleton width={150} height={40} borderRadius={6} />
               </div>
             </div>
           ))
@@ -326,35 +396,49 @@ const WebAPP = () => {
               className="flex flex-col md:flex-row justify-start items-center px-6 md:px-32 mt-20 md:mt-8 gap-y-8 md:gap-x-16 md:w-5/6 m-auto p-8 rounded-lg"
               style={{ backgroundColor: "rgb(164, 189, 247)" }}
             >
-              <div className={`w-full h-auto md:h-full relative my-10 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+              <div
+                className={`w-full h-auto md:h-full relative my-10 ${
+                  index % 2 === 1 ? "md:order-2" : ""
+                }`}
+              >
                 <div className="relative w-full h-[250px]">
                   <Image
                     src={project.Image || "/backgrounds/app2.png"}
                     alt={project.ProjectName || "Project Image"}
                     className="object-cover rounded-lg"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    width={400}
+                    height={250}
                     onError={(e) => {
                       e.target.src = "/backgrounds/app2.png";
                     }}
                   />
                 </div>
               </div>
-              <div className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+              <div
+                className={`flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[45%] ${
+                  index % 2 === 1 ? "md:order-1" : ""
+                }`}
+              >
                 <div className="text-2xl font-bold text-paraClr">
-                  <span className="border-b-4 border-white">{project.ProjectCategory || "Web App"}</span>
+                  <span className="border-b-4 border-white">
+                    {project.ProjectCategory || "Web App"}
+                  </span>
                 </div>
                 <div className="text-4xl text-white font-bebas tracking-custom">
                   {project.ProjectName || "Project Name"}
                 </div>
                 <p className="text-paraClr leading-tight line-clamp-3">
-                  {project.ProjectDescription || "Project description not available."}
+                  {project.ProjectDescription ||
+                    "Project description not available."}
                 </p>
                 <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
-                  <a href={`/Case_Study?project=${project.id || project._id || ""}`} rel="noopener noreferrer">
-                    <button>
-                      READ CASE STUDY
-                    </button>
+                  <a
+                    href={`/Case_Study?project=${
+                      project.id || project._id || ""
+                    }`}
+                    rel="noopener noreferrer"
+                  >
+                    <button>READ CASE STUDY</button>
                   </a>
                 </div>
               </div>
@@ -377,13 +461,14 @@ const WebAPP = () => {
             </div>
             <div className="flex flex-col justify-center items-center md:items-start gap-y-5 text-center md:text-left md:w-[50%]">
               <div className="text-2xl font-bold text-paraClr">
-                <span className="border-b-4 border-white">W e b  A p p</span>
+                <span className="border-b-4 border-white">W e b A p p</span>
               </div>
               <div className="text-4xl text-white font-bebas tracking-custom">
                 NO PROJECTS AVAILABLE
               </div>
               <p className="text-paraClr leading-tight">
-                Currently, there are no Web App projects available to display. Please check back later or contact us for more information.
+                Currently, there are no Web App projects available to display.
+                Please check back later or contact us for more information.
               </p>
               <div className="text-white rounded-md w-40 h-11 border-2 hover:bg-custom-blue border-white text-center justify-center cursor-pointer flex items-center font-bold">
                 <button>COMING SOON</button>
@@ -399,7 +484,6 @@ const WebAPP = () => {
             </button>
           </Link>
         </div>
-
       </section>
       {/* contact from */}
       <Contactform />

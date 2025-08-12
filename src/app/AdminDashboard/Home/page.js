@@ -66,18 +66,28 @@ const AdminHome = () => {
   }, [fetchCounts, router]);
 
   const [showTeamMember, setShowTeamMember] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [teamError, setTeamError] = useState(null);
+
   useEffect(() => {
     const getTeamMembers = async () => {
+      setTeamLoading(true);
+      setTeamError(null);
       try {
         const response = await axios.get(API_URL_TEAM);
         const showTeamMember = response.data.Result?.filter(t => t.order !== 0) || [];
         setShowTeamMember(showTeamMember);
       } catch (error) {
+        setTeamError("Failed to fetch team members.");
         console.error("Error fetching team members:", error);
+      } finally {
+        setTeamLoading(false);
       }
     };
-    getTeamMembers();
-  },[]);
+    if (isAuthenticated()) {
+      getTeamMembers();
+    }
+  }, [router]);
 
   const data = {
     labels: ["January", "February", "March", "April", "May", "June", "July"],
@@ -154,20 +164,23 @@ const AdminHome = () => {
                 <div className="flex items-center text-black">
                   <div className="mr-2">
                     {showTeamMember[0] ? (
-                      <img
-                      src={showTeamMember[0]?.image}
-                      alt="image"
-                      width={90}
-                      height={90}
-                      className="rounded-full h-10 w-10"  
+                      <Image
+                        src={showTeamMember[0]?.image}
+                        alt="image"
+                        width={90}
+                        height={90}
+                        className="rounded-full h-10 w-10"
+                        loading="lazy"
+                        unoptimized
                       />
                     ) : (
                       <Image
-                      src="/team/001.jpg"
-                      alt="image"
-                      width={90}
-                      height={90}
-                      className="rounded-full h-10 w-10"
+                        src="/team/001.jpg"
+                        alt="image"
+                        width={90}
+                        height={90}
+                        className="rounded-full h-10 w-10"
+                        loading="lazy"
                       />
                     )}
                   </div>
@@ -185,21 +198,24 @@ const AdminHome = () => {
                 <div className="flex items-center text-black">
                   <div className="mr-2">
                     {showTeamMember[1] ? (
-                      <img
+                      <Image
                         src={showTeamMember[1]?.image}
                         alt="image"
                         width={90}
                         height={90}
                         className="rounded-full h-10 w-10"
+                        loading="lazy"
+                        unoptimized
                       />
                     ) : (
                       <Image
-                      src="/team/Nouman.jpg"
-                      alt="image"
-                      width={90}
-                      height={90}
-                      className="rounded-full h-10 w-10"
-                    />
+                        src="/team/Nouman.jpg"
+                        alt="image"
+                        width={90}
+                        height={90}
+                        className="rounded-full h-10 w-10"
+                        loading="lazy"
+                      />
                     )}
                   </div>
                   <div className="flex flex-col pl-5">
@@ -216,21 +232,24 @@ const AdminHome = () => {
                 <div className="flex items-center text-black">
                   <div className="mr-2">
                     {showTeamMember[2] ? (
-                      <img
-                      src={showTeamMember[2]?.image}
-                      alt="image"
-                      width={90}
-                      height={90}
-                      className="rounded-full h-10 w-10"
-                      />
-                    ):(
                       <Image
-                      src="/team/team9.jpg"
-                      alt="image"
-                      width={90}
-                      height={90}
-                      className="rounded-full h-10 w-10"
-                    />
+                        src={showTeamMember[2]?.image}
+                        alt="image"
+                        width={90}
+                        height={90}
+                        className="rounded-full h-10 w-10"
+                        loading="lazy"
+                        unoptimized
+                      />
+                    ) : (
+                      <Image
+                        src="/team/team9.jpg"
+                        alt="image"
+                        width={90}
+                        height={90}
+                        className="rounded-full h-10 w-10"
+                        loading="lazy"
+                      />
                     )}
                   </div>
                   <div className="flex flex-col pl-5">
