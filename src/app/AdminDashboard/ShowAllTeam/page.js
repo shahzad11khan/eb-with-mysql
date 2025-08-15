@@ -176,7 +176,7 @@ const ShowAllTeam = () => {
                       <td className="px-4 py-2 text-center">
                         <button
                           className="text-green-500 px-2 py-1 rounded hover:underline"
-                          onClick={() => handleEdit(team._id)}
+                          onClick={() => handleEdit(team.id)}
                         >
                           Edit
                         </button>
@@ -184,7 +184,7 @@ const ShowAllTeam = () => {
                       <td className="px-4 py-2 text-center">
                         <button
                           className="text-red-500 hover:underline"
-                          onClick={() => handleDelete(team._id)}
+                          onClick={() => handleDelete(team.id)}
                         >
                           Delete
                         </button>
